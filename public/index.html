@@ -1,0 +1,128 @@
+<html>
+
+<head>
+  <title>AEC CIM Explorer - BETA</title>
+  <link href="https://unpkg.com/graphiql@1.10.0/graphiql.min.css" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="https://cdn.autodesk.io/favicon.ico">
+</head>
+
+<body style="margin: 0">
+  <div id="graphiql" style="height: calc(100vh - 33px)">
+    Authenticating...
+  </div>
+
+  <script crossorigin src="https://unpkg.com/react/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/graphiql@1.10.0/graphiql.min.js"></script>
+
+  <script>
+    window.addEventListener("load", async () => {
+      try {
+        let url = new URL(window.location.href);
+        let accessToken = url.searchParams.get("access_token");
+        let clientId = url.searchParams.get("client_id");
+        let clientSecret = url.searchParams.get("client_secret");
+
+        if (!accessToken) {
+          let params = "";
+          if (clientId && clientSecret) {
+            params = `?client_id=${clientId}&client_secret=${clientSecret}`;
+          }
+          let res = await fetch(`/oauth/token${params}`);
+          if (!res.ok) throw "No access token";
+
+          accessToken = await res.text();
+
+          // Get a new token every 30 minutes
+          setInterval(async () => {
+            let res = await fetch(`/oauth/token?refresh=true`);
+            if (res.ok) {
+              accessToken = await res.text();
+            } else {
+              let res = await fetch("/oauth/url");
+              url = await res.text();
+              location.href = url;
+            }
+          }, 30 * 60 * 1000);
+        }
+
+        let defaultQuery = `# Welcome to the AEC CIM GraphQL Explorer - BETA
+
+# During this beta, available models are available as part of the following folder.
+
+# HubId: b.768cae14-76b3-4531-9030-25212dab4e48
+# ProjectId: b.f609fbf7-7959-4832-a379-84028c470d0c
+# FolderId: urn:adsk.wipprod:fs.folder:co.FQMMXW7ETQmzcA2eHBwCHw
+# Type: items:autodesk.bim360:FDX
+
+{
+  items(
+    hubId: "b.768cae14-76b3-4531-9030-25212dab4e48"
+    projectId: "b.f609fbf7-7959-4832-a379-84028c470d0c"
+    itemId: "urn:adsk.wipprod:fs.folder:co.FQMMXW7ETQmzcA2eHBwCHw"
+    filter: {extensionType: "items:autodesk.bim360:FDX"}
+  ) {
+    results {
+      id
+      name
+      extensionType
+    }
+  }
+}
+
+# With the ItemId from above query, run the following query to get the DesignId
+
+#{
+#    designs(filter: { designFile: "the item Id here"}) {
+#        results {
+#            id
+#        }
+#    }
+#}
+
+# With the DesignId, you can run designEntities queries:
+
+#{
+#    designEntities(filter: { designId: "the design id here", classificationFilter: {category:"Floors"} }) {
+#        results {
+#            id
+#        }
+#    }
+#}
+
+`;
+
+        function graphQLFetcher(graphQLParams, opts) {
+          const { headers = {} } = opts;
+          return fetch(
+            "https://developer.api.autodesk.com/aeccloudinformationmodel/2022-11/graphql/v1/graph",
+            {
+              method: "post",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + accessToken,
+                ...headers,
+              },
+              body: JSON.stringify(graphQLParams),
+            }
+          ).then((response) => response.json());
+        }
+
+        ReactDOM.render(
+          React.createElement(GraphiQL, {
+            fetcher: graphQLFetcher,
+            query: defaultQuery,
+            defaultQuery: { defaultQuery },
+          }),
+          document.getElementById("graphiql")
+        );
+      } catch {
+        let res = await fetch("/oauth/url");
+        url = await res.text();
+        location.href = url;
+      }
+    });
+  </script>
+</body>
+
+</html>
