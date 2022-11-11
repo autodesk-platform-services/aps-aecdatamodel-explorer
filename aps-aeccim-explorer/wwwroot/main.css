@@ -1,0 +1,41 @@
+﻿body, html {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  font-family: ArtifaktElement;
+}
+
+#header {
+  position: absolute;
+}
+
+#header {
+  height: 3em;
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#graphiql {
+  width: 100%;
+  right: 0;
+  padding-top: 3em;
+  bottom: 0;
+}
+
+#header > * {
+  height: 2em;
+  margin: 0 0.5em;
+}
+
+#login {
+  font-family: ArtifaktElement;
+  font-size: 1em;
+}
+
+#header .title {
+  height: auto;
+  margin-right: auto;
+}
