@@ -1,13 +1,10 @@
-﻿<!--
- *  Copyright (c) 2021 GraphQL Contributors
- *  All rights reserved.
- *
- *  This source code is licensed under the license found in the
- *  LICENSE file in the root directory of this source tree.
--->
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
+
 <head>
+  <title>AEC CIM Explorer - BETA</title>
+  <meta charset="utf-8" />
+  <link rel="shortcut icon" href="http://cdn.autodesk.io/favicon.ico">
   <style>
     body {
       height: 100%;
@@ -20,7 +17,7 @@
       height: calc(100vh - 3em);
     }
   </style>
-  <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.css">
+  <!--<link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.css">-->
   <link rel="stylesheet" href="main.css" />
   <!--
     This GraphiQL example depends on Promise and fetch, which are available in
@@ -29,43 +26,29 @@
     If you do not want to rely on a CDN, you can host these files locally or
     include them directly in your favored resource bundler.
   -->
-  <script crossorigin
-          src="https://unpkg.com/react@17/umd/react.development.js"></script>
-  <script crossorigin
-          src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
 
   <!--
     These two files can be found in the npm module, however you may wish to
     copy them directly into your environment, or perhaps include them in your
     favored resource bundler.
    -->
-  <link rel="stylesheet" href="https://unpkg.com/graphiql/graphiql.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/graphiql@2.0.13/graphiql.min.css" />
 </head>
 
 <body>
   <div id="header">
-    <img class="logo" src="https://raw.githubusercontent.com/autodesk-platform-services/resources/main/wwwroot/logo/black/stacked.png?token=GHSAT0AAAAAABW73ZDWTSGDNDH34UUWGQ4IY3OKF2Q" alt="Autodesk Platform Services">
-    <span class="title">AEC CIM DATA EXPLORER</span>
-    <input type="text" placeholder="PASTE THE URN HERE" id="modelurn"/>
-    <button id="openviewer"></button>
+    <img class="logo" src="https://cdn.autodesk.io/logo/black/stacked.png" alt="Autodesk Platform Services">
+    <span class="title">AEC CIM Explorer - BETA</span>
+    <!--<input type="text" placeholder="PASTE THE URN HERE" id="modelurn" />
+    <button id="openviewer"></button>-->
     <button id="login" style="visibility: hidden;">Login</button>
   </div>
-  <div id="graphiql">Loading...</div>
-  <script src="https://unpkg.com/graphiql/graphiql.min.js"
-          type="application/javascript"></script>
+  <div id="graphiql"></div>
+  <script src="https://unpkg.com/graphiql@2.0.13/graphiql.min.js" type="application/javascript"></script>
+  <script src="main.js" type="module"></script>
   <script>
-    var accessToken = '';
-    // Get a new token every 30 minutes
-    setInterval(async () => {
-      let res = await fetch(`api/auth/token`);
-      if (res.ok) {
-        let resJSON = await res.json();
-        accessToken = resJSON.access_token;
-      } else {
-        await fetch("api/oauth/login");
-      }
-    }, 30 * 60 * 1000);
-
     let defaultQuery = `# Welcome to the AIM GraphiQL Explorer
 
 query {
@@ -77,13 +60,16 @@ query {
 }
 `;
 
-    function graphQLFetcher(graphQLParams, opts) {
+    async function graphQLFetcher(graphQLParams, opts) {
+      // check if existing token still valid, if not refresh
+      let res = await fetch(`api/auth/token`);
+      let resJSON = await res.json();
+      accessToken = resJSON.access_token;
+      if (accessToken === undefined) return 'Please login first';
+
       const { headers = {} } = opts;
-      if (accessToken == '') {
-        document.getElementById('login').click();
-      }
       return fetch(
-         "https://developer.api.autodesk.com/aeccloudinformationmodel/2022-11/graphql/v1/graph",
+        "https://developer.api.autodesk.com/aeccloudinformationmodel/2022-11/graphql/v1/graph",
         {
           method: "post",
           headers: {
@@ -95,17 +81,23 @@ query {
         }
       ).then((response) => response.json());
     }
+
+    function onTabs(data) {
+      console.log(data)
+    }
+
     ReactDOM.render(
       React.createElement(GraphiQL, {
         fetcher: graphQLFetcher,
         query: defaultQuery,
         defaultQuery: { defaultQuery },
         defaultEditorToolsVisibility: true,
+        onTabs: onTabs
       }),
       document.getElementById('graphiql'),
     );
   </script>
-  <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.js"></script>
-  <script src="main.js" type="module"></script>
+  <!--<script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.js"></script>-->
 </body>
+
 </html>
