@@ -48,46 +48,25 @@
 
         let defaultQuery = `# Welcome to the AEC CIM GraphQL Explorer - BETA
 
-# During this beta, available models are available as part of the following folder.
+# Step 1: Pick a hub
 
-# HubId: b.768cae14-76b3-4531-9030-25212dab4e48
-# ProjectId: b.f609fbf7-7959-4832-a379-84028c470d0c
-# FolderId: urn:adsk.wipprod:fs.folder:co.FQMMXW7ETQmzcA2eHBwCHw
-# Type: items:autodesk.bim360:FDX
-
-{
-  items(
-    hubId: "b.768cae14-76b3-4531-9030-25212dab4e48"
-    projectId: "b.f609fbf7-7959-4832-a379-84028c470d0c"
-    itemId: "urn:adsk.wipprod:fs.folder:co.FQMMXW7ETQmzcA2eHBwCHw"
-    filter: {extensionType: "items:autodesk.bim360:FDX"}
-  ) {
+query GetHubs {
+  hubs {
     results {
-      id
       name
-      extensionType
+      id
     }
   }
 }
 
-# With the ItemId from above query, run the following query to get the DesignId
-
-#{
-#    designs(filter: { designFile: "the item Id here"}) {
-#        results {
-#            id
-#        }
+# Step 2: Pick a project
+# {
+#  projects(hubId: "b.768cae14-76b3-4531-9030-25212dab4e48") {
+#    results {
+#      id
+#      name
 #    }
-#}
-
-# With the DesignId, you can run designEntities queries:
-
-#{
-#    designEntities(filter: { designId: "the design id here", classificationFilter: {category:"Floors"} }) {
-#        results {
-#            id
-#        }
-#    }
+#  }
 #}
 
 `;
