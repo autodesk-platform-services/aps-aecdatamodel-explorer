@@ -47,9 +47,9 @@
         }
 
         let defaultQuery = `# Welcome to the AEC CIM GraphQL Explorer - BETA
+# These sample queries are from the Getting Started tutorial
 
 # Step 1: Pick a hub
-
 query GetHubs {
   hubs {
     results {
@@ -60,21 +60,88 @@ query GetHubs {
 }
 
 # Step 2: Pick a project
-# {
-#  projects(hubId: "b.768cae14-76b3-4531-9030-25212dab4e48") {
-#    results {
-#      id
-#      name
-#    }
-#  }
-#}
+query GetProjects {
+  projects(hubId: "b.768cae14-76b3-4531-9030-25212dab4e48") {
+    results {
+      id
+      name
+    }
+  }
+}
+
+# Step 3: Navigate to folders and designs with in a project
+query GetDesigns {
+  project(
+    hubId: "b.768cae14-76b3-4531-9030-25212dab4e48"
+    projectId: "b.f609fbf7-7959-4832-a379-84028c470d0c"
+  ) {
+    id
+    name
+    folders {
+      results {
+        id
+        name
+        items {
+          results {
+            id
+            name
+            __typename
+            ... on Folder {
+              items {
+                results {
+                  name
+                  id
+                  __typename
+                  extensionType
+                  ... on BasicFile {
+                    designId
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+# Step 4: Get design entities with in a design using properties filter
+query GetEntities {
+  designEntities(
+    filter: {designId: "fbb418e4-d663-36fe-bf87-7c555acc4983", propertyFilter: {name: "Level", value: "Level 2"}}
+  ) {
+    pagination {
+      cursor
+      limit
+    }
+    results {
+      references {
+        results {
+          id
+          propertyGroups {
+            results {
+              properties {
+                results {
+                  name
+                  value
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
 
 `;
 
         function graphQLFetcher(graphQLParams, opts) {
           const { headers = {} } = opts;
           return fetch(
-            "https://developer.api.autodesk.com/aeccloudinformationmodel/2022-11/graphql/v1/graph",
+            "https://developer.api.autodesk.com/aeccloudinformationmodel/2022-11/graphql",
             {
               method: "post",
               headers: {
