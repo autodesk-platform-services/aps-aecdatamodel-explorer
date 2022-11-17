@@ -18,7 +18,8 @@
       height: calc(100vh - 3em);
     }
   </style>
-  <!--<link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.css">-->
+  <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-alpha1/css/bootstrap.min.css" />
   <link rel="stylesheet" href="main.css" />
   <!--
     This GraphiQL example depends on Promise and fetch, which are available in
@@ -42,14 +43,24 @@
   <div id="header">
     <img class="logo" src="https://cdn.autodesk.io/logo/black/stacked.png" alt="Autodesk Platform Services">
     <span class="title">AEC CIM Explorer - BETA</span>
-    <!--<input type="text" placeholder="PASTE THE URN HERE" id="modelurn" />
-    <button id="openviewer"></button>-->
+    <input type="text" placeholder="PASTE THE PROJECT ID HERE" value="b.f609fbf7-7959-4832-a379-84028c470d0c" disabled id="projectid" />
+    <input type="text" placeholder="PASTE THE URN HERE" id="modelurn" />
+    <div class="form-check form-switch form-switch-sm">
+      <input class="form-check-input" type="checkbox" id="toggleviewer">
+      <label class="form-check-label" for="toggleviewer">Viewer</label>
+    </div>
     <button id="login" style="visibility: hidden;">Login</button>
   </div>
   <div id="graphiql"></div>
+  <div id="viewer"></div>
   <script src="https://unpkg.com/graphiql@2.0.13/graphiql.min.js" type="application/javascript"></script>
   <script src="main.js" type="module"></script>
   <script>
+    //window.localStorage.removeItem('graphiql:queries');
+    //window.localStorage.setItem('graphiql:queries',``);
+    //window.localStorage.removeItem('graphiql:tabState');
+    //window.localStorage.setItem('graphiql:tabState','{"tabs":[{"id":"2aa87766-a9ef-0ffa-e084-35466a83368a","hash":null,"title":"AIM QUERY","query":"# Welcome to the AIM GraphiQL Explorer\n\n{\n    designEntities(filter: { designId: \"fbb418e4-d663-36fe-bf87-7c555acc4983\", classificationFilter:{category:\"Walls\"}}) {\n        pagination {\n            cursor\n            limit\n        }\n        results {\n          name\n          classification{\n            category\n          }\n          properties(filter:{name:\"sourceId\"}){\n            results{\n              name\n              displayValue\n              value\n            }\n          }\n        }\n    }\n}\n","variables":"","headers":null,"operationName":null,"response":null},{"id":"8fb95a2a-ec61-7854-ff60-0fe5e0c8fb32","hash":null,"title":"<untitled>","query":"# Welcome to the AIM GraphiQL Explorer\n\nquery {\n  hubs {\n    results {\n      name\n    }\n  }\n}\n","variables":"","headers":null,"operationName":null,"response":null}],"activeTabIndex":0}');
+    var queryResponse = '';
     let defaultQuery = `# Welcome to the AIM GraphiQL Explorer
 
 query {
@@ -70,7 +81,7 @@ query {
 
       const { headers = {} } = opts;
       return fetch(
-        "https://developer.api.autodesk.com/aeccloudinformationmodel/2022-11/graphql/v1/graph",
+        "https://developer.api.autodesk.com/aeccloudinformationmodel/2022-11/graphql",
         {
           method: "post",
           headers: {
@@ -80,25 +91,31 @@ query {
           },
           body: JSON.stringify(graphQLParams),
         }
-      ).then((response) => response.json());
+      ).then(async (response) => {
+        queryResponse = await response.json();
+        return queryResponse;
+      });
     }
 
     function onTabs(data) {
       console.log(data)
     }
 
+    //query: defaultQuery,
+    //defaultQuery: { defaultQuery },
+
     ReactDOM.render(
       React.createElement(GraphiQL, {
         fetcher: graphQLFetcher,
-        query: defaultQuery,
-        defaultQuery: { defaultQuery },
         defaultEditorToolsVisibility: true,
-        onTabs: onTabs
+        onTabs: onTabs,
+        query: defaultQuery,
+        defaultQuery: {defaultQuery}
       }),
       document.getElementById('graphiql'),
     );
   </script>
-  <!--<script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.js"></script>-->
+  <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.js"></script>
 </body>
 
 </html>

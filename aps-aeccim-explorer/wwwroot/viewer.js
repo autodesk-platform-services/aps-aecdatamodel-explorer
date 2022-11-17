@@ -1,4 +1,5 @@
 ﻿/// import * as Autodesk from "@types/forge-viewer";
+import './AIMFilterExtension.js'
 
 async function getAccessToken(callback) {
   try {
@@ -9,7 +10,7 @@ async function getAccessToken(callback) {
     const { access_token, expires_in } = await resp.json();
     callback(access_token, expires_in);
   } catch (err) {
-    alert('Could not obtain access token. See the console for more details.');
+    //alert('Could not obtain access token. See the console for more details.');
     console.error(err);
   }
 }
@@ -17,7 +18,13 @@ async function getAccessToken(callback) {
 export function initViewer(container) {
   return new Promise(function (resolve, reject) {
     Autodesk.Viewing.Initializer({ getAccessToken }, async function () {
-      const viewer = new Autodesk.Viewing.GuiViewer3D(container);
+      const config = {
+        extensions: [
+          'AIMFilterExtension',
+          'Autodesk.DocumentBrowser'
+        ]
+      }
+      const viewer = new Autodesk.Viewing.GuiViewer3D(container, config);
       viewer.start();
       viewer.setTheme('light-theme');
       resolve(viewer);
