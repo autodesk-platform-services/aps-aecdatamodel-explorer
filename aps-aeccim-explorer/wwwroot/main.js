@@ -9,8 +9,9 @@ window.addEventListener("load", async () => {
   const viewerDiv = document.getElementById('viewer');
   const graphiqlDiv = document.getElementById('graphiql');
   new ResizeObserver(() => {
-    viewerDiv.style.height = `calc( ${document.body.scrollHeight}px - (3em + ${graphiqlDiv.style.height}))`;
-    globalViewer.resize();
+    viewerDiv.style.height = `calc( ${document.body.scrollHeight}px - (3em + ${graphiqlDiv.clientHeight}px))`;
+    if(!!globalViewer)
+      globalViewer.resize();
   }).observe(graphiqlDiv);
   initViewer(viewerDiv).then(viewer => {
     globalViewer = viewer;
@@ -20,7 +21,7 @@ window.addEventListener("load", async () => {
         await loadNDisplayModel(graphiqlDiv, viewerDiv, viewer, versions[0].id);
       }
       else {
-        hideModel();
+        hideModel(viewerDiv);
       }
     }
   });
@@ -44,8 +45,9 @@ window.addEventListener("load", async () => {
 async function loadNDisplayModel(graphiqlDiv, viewerDiv, viewer, urn) {
   try {
     viewerDiv.style.visibility = 'visible';
-    viewerDiv.style.height = `calc( ${document.body.scrollHeight}px - (3em + ${graphiqlDiv.style.height}))`;
-    loadModel(viewer, btoa(urn));
+    viewerDiv.style.height = `calc( ${document.body.scrollHeight}px - (3em + ${graphiqlDiv.clientHeight}px))`;
+    viewer.resize();
+    loadModel(viewer, btoa(urn)).then();
   }
   catch (err) {
     console.log(`Not able to load the model: ${err}`);
