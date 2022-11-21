@@ -86,19 +86,9 @@ query GetDesigns {
             id
             name
             __typename
-            ... on Folder {
-              items {
-                results {
-                  name
-                  id
-                  __typename
-                  extensionType
-                  ... on BasicFile {
-                    designId
-                    name
-                  }
-                }
-              }
+            ... on BasicFile {
+              designId
+              name
             }
           }
         }
