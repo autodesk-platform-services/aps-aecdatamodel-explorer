@@ -100,32 +100,27 @@ query GetDesigns {
 # Step 4: Get design entities with in a design using properties filter
 query GetEntities {
   designEntities(
-    filter: {designId: "fbb418e4-d663-36fe-bf87-7c555acc4983", propertyFilter: {name: "Level", value: "Level 2"}}
+    filter: {designId: "4e5c860f-ff19-3e2d-8375-89f235be54dd", propertyFilter: {name: "family", value: "Basic Wall"}}
   ) {
     pagination {
       cursor
       limit
     }
     results {
-      references {
+      id
+      name
+      classification {
+        category
+      }
+      properties {
         results {
-          id
-          propertyGroups {
-            results {
-              properties {
-                results {
-                  name
-                  value
-                }
-              }
-            }
-          }
+          name
+          value
         }
       }
     }
   }
 }
-
 `;
 
         function graphQLFetcher(graphQLParams, opts) {
