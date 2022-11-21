@@ -2,9 +2,15 @@
   constructor(viewer, options) {
     super(viewer, options);
     this._button = null;
+    this._onObjectTreeCreated = (ev) => this.onModelLoaded(ev.model);
+  }
+
+  async onModelLoaded(model) {
+    this.leafNodes = await this.findLeafNodes(model);
   }
 
   load() {
+    this.viewer.addEventListener(Autodesk.Viewing.OBJECT_TREE_CREATED_EVENT, this._onObjectTreeCreated);
     return true;
   }
 
@@ -46,7 +52,9 @@
         if (!!dbid)
           dbids.push(dbid);
       });
-      this.viewer.isolate(dbids);
+      let leafNodesIds = dbids.filter(dbid => this.leafNodes.includes(dbid));
+      showToast(`${leafNodesIds.length} elements found!`);
+      this.viewer.isolate(leafNodesIds);
       this.viewer.fitToView();
     }, console.log)
   }
@@ -62,21 +70,6 @@
       sourceIdIndex = stringArrayResponse.findIndex(s => s.includes('sourceId'));
     }
     return externalIds.filter(i => !!i);
-  }
-
-  async findPropertyNames(model) {
-    const dbids = await this.findLeafNodes(model);
-    return new Promise(function (resolve, reject) {
-      model.getBulkProperties(dbids, {}, function (results) {
-        let propNames = new Set();
-        for (const result of results) {
-          for (const prop of result.properties) {
-            propNames.add(prop.displayName);
-          }
-        }
-        resolve(Array.from(propNames.values()));
-      }, reject);
-    });
   }
 
   createToolbarButton(buttonId, buttonIconUrl, buttonTooltip) {
@@ -105,3 +98,13 @@
 }
 
 Autodesk.Viewing.theExtensionManager.registerExtension('AIMFilterExtension', AIMFilterExtension);
+
+async function showToast(message) {
+  Swal.fire({
+    title: message,
+    timer: 3000,
+    toast: true,
+    position: 'top',
+    showConfirmButton: false
+  })
+}

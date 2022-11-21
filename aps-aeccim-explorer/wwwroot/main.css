@@ -59,8 +59,8 @@
   margin-bottom: 0.5rem; /* JUST FOR STYLING PURPOSE */
 }
 
-  .form-switch.form-switch-sm .form-check-input {
-    height: 2em;
-    width: calc(2em + 1.5em);
-    border-radius: 2rem;
-  }
+.form-switch.form-switch-sm .form-check-input {
+  height: 2em;
+  width: calc(2em + 1.5em);
+  border-radius: 2rem;
+}

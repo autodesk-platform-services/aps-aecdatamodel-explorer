@@ -15,16 +15,23 @@ window.addEventListener("load", async () => {
   }).observe(graphiqlDiv);
   initViewer(viewerDiv).then(viewer => {
     globalViewer = viewer;
-    viewerToggle.onclick = async (cb) => {
-      if (cb.currentTarget.checked) {
+  });
+  viewerToggle.onclick = async (cb) => {
+    try {
+      if (cb.target.checked) {
         let versions = await (await fetch(`/api/hubs/${projectidInput.value}/contents/${urnInput.value}/versions`)).json();
-        await loadNDisplayModel(graphiqlDiv, viewerDiv, viewer, versions[0].id);
+        await resizeGraphiql(graphiqlDiv, false);
+        await loadNDisplayModel(graphiqlDiv, viewerDiv, globalViewer, versions[0].id);
       }
       else {
         hideModel(viewerDiv);
+        await resizeGraphiql(graphiqlDiv, true);
       }
+    } catch (error) {
+      console.error(error);
+      cb.target.checked = false;
     }
-  });
+  }
   try {
     const resp = await fetch('/api/auth/profile');
     if (resp.ok) {
@@ -41,6 +48,15 @@ window.addEventListener("load", async () => {
     console.error(err);
   }
 })
+
+async function resizeGraphiql(graphiqlDiv ,increase) {
+  if (increase) {
+    graphiqlDiv.style.height = 'calc(100% - 3em)';
+  }
+  else {
+    graphiqlDiv.style.height = 'calc(70%)';
+  }
+}
 
 async function loadNDisplayModel(graphiqlDiv, viewerDiv, viewer, urn) {
   try {

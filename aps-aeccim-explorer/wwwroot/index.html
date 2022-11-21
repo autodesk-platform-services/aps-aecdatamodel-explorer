@@ -53,24 +53,145 @@
   </div>
   <div id="graphiql"></div>
   <div id="viewer"></div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://unpkg.com/graphiql@2.0.13/graphiql.min.js" type="application/javascript"></script>
   <script src="main.js" type="module"></script>
   <script>
-    //window.localStorage.removeItem('graphiql:queries');
-    //window.localStorage.setItem('graphiql:queries',``);
-    //window.localStorage.removeItem('graphiql:tabState');
-    //window.localStorage.setItem('graphiql:tabState','{"tabs":[{"id":"2aa87766-a9ef-0ffa-e084-35466a83368a","hash":null,"title":"AIM QUERY","query":"# Welcome to the AIM GraphiQL Explorer\n\n{\n    designEntities(filter: { designId: \"fbb418e4-d663-36fe-bf87-7c555acc4983\", classificationFilter:{category:\"Walls\"}}) {\n        pagination {\n            cursor\n            limit\n        }\n        results {\n          name\n          classification{\n            category\n          }\n          properties(filter:{name:\"sourceId\"}){\n            results{\n              name\n              displayValue\n              value\n            }\n          }\n        }\n    }\n}\n","variables":"","headers":null,"operationName":null,"response":null},{"id":"8fb95a2a-ec61-7854-ff60-0fe5e0c8fb32","hash":null,"title":"<untitled>","query":"# Welcome to the AIM GraphiQL Explorer\n\nquery {\n  hubs {\n    results {\n      name\n    }\n  }\n}\n","variables":"","headers":null,"operationName":null,"response":null}],"activeTabIndex":0}');
     var queryResponse = '';
-    let defaultQuery = `# Welcome to the AIM GraphiQL Explorer
+    let defaultQuery = `# Task 1 – Pick a Hub
 
 query {
+      hubs {
+        results {
+          name
+        }
+      }
+}
+`;
+    setInitialTabs();
+
+    function setInitialTabs() {
+      let tabState = JSON.parse(window.localStorage.getItem('graphiql:tabState'));
+      if (!!tabState) {
+        let nonTutorialTabs = tabState.tabs.filter(tab => !tab.query.match(/Task 1 – Pick a Hub|Task 2 – Pick a Projects|Task 3 – Navigate to folders and designs with in a project|Task 4 – Get Design Entities within a design using properties filter/g))
+        let tutorialTabs = [{ query: 'Task 1' }, { query: 'Task 2' }, { query: 'Task 3' }, { query: 'Task 4' }].map(ensureTutorialTab);
+        tabState.tabs = nonTutorialTabs.concat(tutorialTabs);
+        let tabStateString = JSON.stringify(tabState);
+        window.localStorage.setItem('graphiql:tabState', tabStateString);
+      }
+      else {
+        alert('Next time you load, this will include tutorial queries ;)');
+      }
+    }
+
+    function generateUUID() {
+      let
+        d = new Date().getTime(),
+        d2 = (performance && performance.now && (performance.now() * 1000)) || 0;
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        let r = Math.random() * 16;
+        if (d > 0) {
+          r = (d + r) % 16 | 0;
+          d = Math.floor(d / 16);
+        } else {
+          r = (d2 + r) % 16 | 0;
+          d2 = Math.floor(d2 / 16);
+        }
+        return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
+      });
+    };
+
+
+    function ensureTutorialTab(tab) {
+      //let matches = tab.query.match(/Task 1 – Pick a Hub|Task 2 – Pick a Projects|Task 3 – Navigate to folders and designs with in a project|Task 4 – Get Design Entities within a design using properties filter/g);
+      let task = tab.query;
+      tab.hash = null;
+      tab.headers = null;
+      tab.id = generateUUID();
+      tab.operationName = null;
+      tab.response = null;
+      tab.title = task
+      tab.variables = null;
+      switch (task) {
+        case 'Task 1':
+          tab.query = `# Task 1 – Pick a Hub
+query GetHubs {
   hubs {
     results {
       name
+      id
     }
   }
-}
-`;
+}`;
+          break;
+        case 'Task 2':
+          tab.query = `# Task 2 – Pick a Projects
+query GetProjects {
+projects(hubId: "b.768cae14-76b3-4531-9030-25212dab4e48") {
+    results {
+    id
+    name
+    }
+ }
+}`;
+          break;
+        case 'Task 3':
+          tab.query = `# Task 3 – Navigate to folders and designs with in a project
+query GetDesigns {
+        project(
+            hubId: "b.768cae14-76b3-4531-9030-25212dab4e48"
+            projectId: "b.f609fbf7-7959-4832-a379-84028c470d0c"
+        ) {
+            id
+            name
+            folders {
+            results {
+                id
+                name
+                items {
+                results {
+                    id
+                    name
+                    __typename
+                    ... on BasicFile {
+                    designId
+                    name
+                    }
+                }
+            }
+        }
+      }
+    }
+}`;
+          break;
+        case 'Task 4':
+          tab.query = `# Task 4 – Get Design Entities within a design using properties filter
+{   designEntities(
+    filter: {designId: "4e5c860f-ff19-3e2d-8375-89f235be54dd", propertyFilter: {name: "family", value: "Basic Wall"}}
+ ) {
+    pagination {
+    cursor
+    limit
+    }
+    results {
+    id
+    name
+    classification{
+        category
+    }
+    properties {
+        results {
+        name
+        value
+        }
+    }
+    }
+ }
+}`;
+          break;
+      }
+      return tab;
+    }
 
     async function graphQLFetcher(graphQLParams, opts) {
       // check if existing token still valid, if not refresh
@@ -101,16 +222,13 @@ query {
       console.log(data)
     }
 
-    //query: defaultQuery,
-    //defaultQuery: { defaultQuery },
-
     ReactDOM.render(
       React.createElement(GraphiQL, {
         fetcher: graphQLFetcher,
         defaultEditorToolsVisibility: true,
         onTabs: onTabs,
         query: defaultQuery,
-        defaultQuery: {defaultQuery}
+        defaultQuery: { defaultQuery }
       }),
       document.getElementById('graphiql'),
     );
