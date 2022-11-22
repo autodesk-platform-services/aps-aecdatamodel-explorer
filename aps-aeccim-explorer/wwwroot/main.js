@@ -1,7 +1,7 @@
 ﻿import { initViewer, loadModel } from './viewer.js'
-var globalViewer = '';
 
 window.addEventListener("load", async () => {
+  window.globalViewer = '';
   const login = document.getElementById('login');
   const urnInput = document.getElementById('modelurn');
   const projectidInput = document.getElementById('projectid');
@@ -19,9 +19,13 @@ window.addEventListener("load", async () => {
   viewerToggle.onclick = async (cb) => {
     try {
       if (cb.target.checked) {
-        let versions = await (await fetch(`/api/hubs/${projectidInput.value}/contents/${urnInput.value}/versions`)).json();
+        let itemId = urnInput.value;
+        if (!itemId.includes('version')) {
+          let versions = await (await fetch(`/api/hubs/${projectidInput.value}/contents/${itemId}/versions`)).json();
+          itemId = versions[0].id;
+        }
         await resizeGraphiql(graphiqlDiv, false);
-        await loadNDisplayModel(graphiqlDiv, viewerDiv, globalViewer, versions[0].id);
+        await loadNDisplayModel(graphiqlDiv, viewerDiv, globalViewer, itemId);
       }
       else {
         hideModel(viewerDiv);

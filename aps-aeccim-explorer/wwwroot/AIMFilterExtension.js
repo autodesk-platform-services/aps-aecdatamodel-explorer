@@ -24,10 +24,16 @@
 
   onToolbarCreated() {
     this._button = this.createToolbarButton('aimfilterextension-button', 'https://img.icons8.com/ios-glyphs/30/null/empty-filter.png', 'Filter Model Based on Query');
-    this._button.onClick = async() => {
-      let externalIds = await this.retrieveOccurences(queryResponse);
-      this.dbidsFromExternalIds(externalIds);
-    };
+    //this._button.onClick = async() => {
+    //  let externalIds = await this.retrieveOccurences(queryResponse);
+    //  this.dbidsFromExternalIds(externalIds);
+    //};
+    this._button.onClick = this.filterModel.bind(this);
+  }
+
+  async filterModel() {
+    let externalIds = await this.retrieveOccurences(queryResponse);
+    this.dbidsFromExternalIds(externalIds);
   }
 
   findLeafNodes(model) {

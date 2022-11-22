@@ -44,7 +44,7 @@
     <img class="logo" src="https://cdn.autodesk.io/logo/black/stacked.png" alt="Autodesk Platform Services">
     <span class="title">AEC CIM Explorer - BETA</span>
     <input type="text" placeholder="PASTE THE PROJECT ID HERE" value="b.f609fbf7-7959-4832-a379-84028c470d0c" disabled id="projectid" />
-    <input type="text" placeholder="PASTE THE URN HERE" id="modelurn" />
+    <input type="text" placeholder="ITEM/VERSION ID HERE" id="modelurn" />
     <div class="form-check form-switch form-switch-sm">
       <input class="form-check-input" type="checkbox" id="toggleviewer">
       <label class="form-check-label" for="toggleviewer">Viewer</label>
@@ -80,7 +80,14 @@ query {
         window.localStorage.setItem('graphiql:tabState', tabStateString);
       }
       else {
-        alert('Next time you load, this will include tutorial queries ;)');
+        tabState = {
+          activeTabIndex: 0,
+          tabs: []
+        };
+        let tutorialTabs = [{ query: 'Task 1' }, { query: 'Task 2' }, { query: 'Task 3' }, { query: 'Task 4' }].map(ensureTutorialTab);
+        tabState.tabs.push(...tutorialTabs);
+        let tabStateString = JSON.stringify(tabState);
+        window.localStorage.setItem('graphiql:tabState', tabStateString);
       }
     }
 
@@ -109,10 +116,10 @@ query {
       tab.id = generateUUID();
       tab.operationName = null;
       tab.response = null;
-      tab.title = task
       tab.variables = null;
       switch (task) {
         case 'Task 1':
+          tab.title = 'GetHubs';
           tab.query = `# Task 1 – Pick a Hub
 query GetHubs {
   hubs {
@@ -124,6 +131,7 @@ query GetHubs {
 }`;
           break;
         case 'Task 2':
+          tab.title = 'GetProjects';
           tab.query = `# Task 2 – Pick a Projects
 query GetProjects {
 projects(hubId: "b.768cae14-76b3-4531-9030-25212dab4e48") {
@@ -135,6 +143,7 @@ projects(hubId: "b.768cae14-76b3-4531-9030-25212dab4e48") {
 }`;
           break;
         case 'Task 3':
+          tab.title = 'GetDesigns';
           tab.query = `# Task 3 – Navigate to folders and designs with in a project
 query GetDesigns {
         project(
@@ -164,6 +173,7 @@ query GetDesigns {
 }`;
           break;
         case 'Task 4':
+          tab.title = '<untitled>';
           tab.query = `# Task 4 – Get Design Entities within a design using properties filter
 {   designEntities(
     filter: {designId: "4e5c860f-ff19-3e2d-8375-89f235be54dd", propertyFilter: {name: "family", value: "Basic Wall"}}
@@ -213,6 +223,9 @@ query GetDesigns {
         }
       ).then(async (response) => {
         queryResponse = await response.json();
+        if (!!globalViewer) {
+          globalViewer.getExtension('AIMFilterExtension').filterModel();
+        }
         return queryResponse;
       });
     }
