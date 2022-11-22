@@ -9,7 +9,7 @@ window.addEventListener("load", async () => {
   const viewerDiv = document.getElementById('viewer');
   const graphiqlDiv = document.getElementById('graphiql');
   new ResizeObserver(() => {
-    viewerDiv.style.height = `calc( ${document.body.scrollHeight}px - (3em + ${graphiqlDiv.clientHeight}px))`;
+    viewerDiv.style.height = `calc( ${document.body.scrollHeight}px - (1em + ${graphiqlDiv.clientHeight}px))`;
     if(!!globalViewer)
       globalViewer.resize();
   }).observe(graphiqlDiv);
@@ -61,7 +61,7 @@ async function resizeGraphiql(graphiqlDiv ,increase) {
 async function loadNDisplayModel(graphiqlDiv, viewerDiv, viewer, urn) {
   try {
     viewerDiv.style.visibility = 'visible';
-    viewerDiv.style.height = `calc( ${document.body.scrollHeight}px - (3em + ${graphiqlDiv.clientHeight}px))`;
+    viewerDiv.style.height = `calc( ${document.body.scrollHeight}px - (1em + ${graphiqlDiv.clientHeight}px))`;
     viewer.resize();
     loadModel(viewer, btoa(urn)).then();
   }
