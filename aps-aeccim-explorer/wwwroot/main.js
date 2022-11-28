@@ -32,6 +32,7 @@ window.addEventListener("load", async () => {
         await resizeGraphiql(graphiqlDiv, true);
       }
     } catch (error) {
+      showToast(`Please, ensure you're logged in and using a valid item/version ID!`);
       console.error(error);
       cb.target.checked = false;
     }
@@ -52,6 +53,16 @@ window.addEventListener("load", async () => {
     console.error(err);
   }
 })
+
+async function showToast(message) {
+  Swal.fire({
+    title: message,
+    timer: 3000,
+    toast: true,
+    position: 'top',
+    showConfirmButton: false
+  })
+}
 
 async function resizeGraphiql(graphiqlDiv ,increase) {
   if (increase) {

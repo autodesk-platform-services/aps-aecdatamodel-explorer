@@ -47,7 +47,7 @@
     <input type="text" placeholder="ITEM/VERSION ID HERE" id="modelurn" />
     <div class="form-check form-switch form-switch-sm">
       <input class="form-check-input" type="checkbox" id="toggleviewer">
-      <label class="form-check-label" for="toggleviewer">Viewer</label>
+      <label class="form-check-label" for="toggleviewer" style="margin:0.3em">Viewer</label>
     </div>
     <button id="login" style="visibility: hidden;">Login</button>
   </div>
@@ -173,9 +173,10 @@ query GetDesigns {
 }`;
           break;
         case 'Task 4':
-          tab.title = '<untitled>';
+          tab.title = 'GetDesignEntities';
           tab.query = `# Task 4 – Get Design Entities within a design using properties filter
-{   designEntities(
+query GetDesignEntities {
+  designEntities(
     filter: {designId: "4e5c860f-ff19-3e2d-8375-89f235be54dd", propertyFilter: {name: "family", value: "Basic Wall"}}
  ) {
     pagination {

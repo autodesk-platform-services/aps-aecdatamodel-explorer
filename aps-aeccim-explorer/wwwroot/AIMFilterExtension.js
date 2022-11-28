@@ -24,10 +24,6 @@
 
   onToolbarCreated() {
     this._button = this.createToolbarButton('aimfilterextension-button', 'https://img.icons8.com/ios-glyphs/30/null/empty-filter.png', 'Filter Model Based on Query');
-    //this._button.onClick = async() => {
-    //  let externalIds = await this.retrieveOccurences(queryResponse);
-    //  this.dbidsFromExternalIds(externalIds);
-    //};
     this._button.onClick = this.filterModel.bind(this);
   }
 
@@ -59,7 +55,6 @@
           dbids.push(dbid);
       });
       let leafNodesIds = dbids.filter(dbid => this.leafNodes.includes(dbid));
-      showToast(`${leafNodesIds.length} elements found!`);
       this.viewer.isolate(leafNodesIds);
       this.viewer.fitToView();
     }, console.log)
@@ -104,13 +99,3 @@
 }
 
 Autodesk.Viewing.theExtensionManager.registerExtension('AIMFilterExtension', AIMFilterExtension);
-
-async function showToast(message) {
-  Swal.fire({
-    title: message,
-    timer: 3000,
-    toast: true,
-    position: 'top',
-    showConfirmButton: false
-  })
-}
