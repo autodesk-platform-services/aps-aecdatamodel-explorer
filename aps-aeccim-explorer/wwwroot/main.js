@@ -54,7 +54,7 @@ window.addEventListener("load", async () => {
 })
 
 async function showHelper(message) {
-  let popupWidth = window.screen.width * 0.5;
+  let popupWidth = Math.min(window.screen.availWidth * 0.5, 800);
   Swal.fire({
     title: message,
     timer: 8000,
