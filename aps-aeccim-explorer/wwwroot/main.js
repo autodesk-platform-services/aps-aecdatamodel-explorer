@@ -1,7 +1,6 @@
 ﻿import { initViewer, loadModel } from './viewer.js'
 
 window.addEventListener("load", async () => {
-  window.globalViewer = '';
   const login = document.getElementById('login');
   const urnInput = document.getElementById('modelurn');
   const projectidInput = document.getElementById('projectid');
@@ -32,7 +31,7 @@ window.addEventListener("load", async () => {
         await resizeGraphiql(graphiqlDiv, true);
       }
     } catch (error) {
-      showToast(`Please, ensure you're logged in and using a valid item/version ID!`);
+      showHelper(`Error on loading the Viewer!`);
       console.error(error);
       cb.target.checked = false;
     }
@@ -54,13 +53,20 @@ window.addEventListener("load", async () => {
   }
 })
 
-async function showToast(message) {
+async function showHelper(message) {
+  let popupWidth = window.screen.width * 0.5;
   Swal.fire({
     title: message,
-    timer: 3000,
-    toast: true,
-    position: 'top',
-    showConfirmButton: false
+    timer: 8000,
+    position: 'top-end',
+    showConfirmButton: false,
+    imageUrl: "./helperimg.png",
+    backdrop: `
+      rgba(37, 40, 44, 0.65)
+    `,
+    width: popupWidth,
+    imageHeight: popupWidth * 0.367,
+    imageWidth: popupWidth
   })
 }
 

@@ -42,7 +42,7 @@
 <body>
   <div id="header">
     <img class="logo" src="https://cdn.autodesk.io/logo/black/stacked.png" alt="Autodesk Platform Services">
-    <span class="title">AEC CIM Explorer - BETA</span>
+    <span class="title">AEC Cloud Information Model Explorer - BETA</span>
     <input type="text" placeholder="PASTE THE PROJECT ID HERE" value="b.f609fbf7-7959-4832-a379-84028c470d0c" disabled id="projectid" />
     <input type="text" placeholder="ITEM/VERSION ID HERE" id="modelurn" />
     <div class="form-check form-switch form-switch-sm">
@@ -57,38 +57,46 @@
   <script src="https://unpkg.com/graphiql@2.0.13/graphiql.min.js" type="application/javascript"></script>
   <script src="main.js" type="module"></script>
   <script>
+    var globalViewer = '';
     var queryResponse = '';
-    let defaultQuery = `# Task 1 – Pick a Hub
-
-query {
-      hubs {
-        results {
-          name
+    let defaultQuery = `query GetDesignEntitiesByProperty{
+    designEntities(filter: { designId: "4e5c860f-ff19-3e2d-8375-89f235be54dd", propertyFilter: { name: "Volume", value: "1.0", operator: LT } }, pagination: { limit: 5 }) {
+        pagination {
+            limit
+            cursor
         }
-      }
+        results {
+            id
+            name
+            properties {
+                results {
+                    name
+                    value
+                }
+            }
+        }
+    }
 }
 `;
     setInitialTabs();
 
     function setInitialTabs() {
       let tabState = JSON.parse(window.localStorage.getItem('graphiql:tabState'));
+      let tutorialTabs = [{ query: 'Task 1' }, { query: 'Task 2' }, { query: 'Task 3' }, { query: 'Task 4' }].map(ensureTutorialTab);
       if (!!tabState) {
         let nonTutorialTabs = tabState.tabs.filter(tab => !tab.query.match(/Task 1 – Pick a Hub|Task 2 – Pick a Projects|Task 3 – Navigate to folders and designs with in a project|Task 4 – Get Design Entities within a design using properties filter/g))
-        let tutorialTabs = [{ query: 'Task 1' }, { query: 'Task 2' }, { query: 'Task 3' }, { query: 'Task 4' }].map(ensureTutorialTab);
-        tabState.tabs = nonTutorialTabs.concat(tutorialTabs);
-        let tabStateString = JSON.stringify(tabState);
-        window.localStorage.setItem('graphiql:tabState', tabStateString);
+        tabState.tabs = tutorialTabs.concat(nonTutorialTabs);
       }
       else {
         tabState = {
           activeTabIndex: 0,
           tabs: []
         };
-        let tutorialTabs = [{ query: 'Task 1' }, { query: 'Task 2' }, { query: 'Task 3' }, { query: 'Task 4' }].map(ensureTutorialTab);
         tabState.tabs.push(...tutorialTabs);
-        let tabStateString = JSON.stringify(tabState);
-        window.localStorage.setItem('graphiql:tabState', tabStateString);
       }
+      let tabStateString = JSON.stringify(tabState);
+      window.localStorage.setItem('graphiql:tabState', tabStateString);
+
     }
 
     function generateUUID() {
