@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>AEC CIM Explorer - BETA</title>
+  <title>AEC Cloud Information Model Explorer - BETA</title>
   <meta charset="utf-8" />
   <link rel="shortcut icon" href="http://cdn.autodesk.io/favicon.ico">
   <link rel="mask-icon" href="http://cdn.autodesk.io/favicon.ico">
@@ -21,6 +21,8 @@
   <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-alpha1/css/bootstrap.min.css" />
   <link rel="stylesheet" href="main.css" />
+  <!-- This link will always fetch the latest version of Balloon.css -->
+  <link rel="stylesheet" href="https://unpkg.com/balloon-css/balloon.min.css">
   <!--
     This GraphiQL example depends on Promise and fetch, which are available in
     modern browsers, but can be "polyfilled" for older browsers.
@@ -43,13 +45,20 @@
   <div id="header">
     <img class="logo" src="https://cdn.autodesk.io/logo/black/stacked.png" alt="Autodesk Platform Services">
     <span class="title">AEC Cloud Information Model Explorer - BETA</span>
-    <input type="text" placeholder="PASTE THE PROJECT ID HERE" value="b.f609fbf7-7959-4832-a379-84028c470d0c" disabled id="projectid" />
-    <input type="text" placeholder="ITEM/VERSION ID HERE" id="modelurn" />
+    <div id="projectinput" data-balloon-length="fit" aria-label="Project id is fixed for this beta!"
+            data-balloon-pos="down">
+      <input type="text" placeholder="PASTE THE PROJECT ID HERE" value="b.f609fbf7-7959-4832-a379-84028c470d0c" disabled id="projectid" />
+    </div>
+    <div id="iteminput" data-balloon-length="fit" aria-label="Here goes an item/version id like urn:adsk.wipprod:dm.lineage..."
+            data-balloon-pos="down">
+      <input type="text" placeholder="ITEM/VERSION ID HERE" id="modelurn" />
+    </div>
     <div class="form-check form-switch form-switch-sm">
       <input class="form-check-input" type="checkbox" id="toggleviewer">
       <label class="form-check-label" for="toggleviewer" style="margin:0.3em">Viewer</label>
     </div>
-    <button id="login" style="visibility: hidden;">Login</button>
+    <button id="login" style="visibility: hidden;"  data-balloon-length="fit" aria-label="Login Here!"
+            data-balloon-pos="down">Login</button>
   </div>
   <div id="graphiql"></div>
   <div id="viewer"></div>
@@ -216,7 +225,10 @@ query GetDesignEntities {
       let res = await fetch(`api/auth/token`);
       let resJSON = await res.json();
       accessToken = resJSON.access_token;
-      if (accessToken === undefined) return 'Please login first';
+      if (accessToken === undefined) {
+        showHelpers('login');
+        return 'Please login first';
+      }
 
       const { headers = {} } = opts;
       return fetch(
@@ -241,6 +253,12 @@ query GetDesignEntities {
 
     function onTabs(data) {
       console.log(data)
+    }
+
+    async function showHelpers(elementId) {
+      let itemInput = document.getElementById(elementId);
+      itemInput.setAttribute('data-balloon-visible', '');
+      setTimeout(() => { itemInput.removeAttribute('data-balloon-visible', ''); }, 5000);
     }
 
     ReactDOM.render(

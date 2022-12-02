@@ -31,7 +31,9 @@ window.addEventListener("load", async () => {
         await resizeGraphiql(graphiqlDiv, true);
       }
     } catch (error) {
-      showHelper(`Error on loading the Viewer!`);
+      showToast(`Please, ensure you're logged in and using a valid item/version ID!`);
+      showHelpers('iteminput');
+      showHelpers('login');
       console.error(error);
       cb.target.checked = false;
     }
@@ -53,20 +55,13 @@ window.addEventListener("load", async () => {
   }
 })
 
-async function showHelper(message) {
-  let popupWidth = Math.min(window.screen.availWidth * 0.5, 800);
+async function showToast(message) {
   Swal.fire({
     title: message,
-    timer: 8000,
-    position: 'top-end',
-    showConfirmButton: false,
-    imageUrl: "./helperimg.png",
-    backdrop: `
-      rgba(37, 40, 44, 0.65)
-    `,
-    width: popupWidth,
-    imageHeight: popupWidth * 0.367,
-    imageWidth: popupWidth
+    timer: 5000,
+    toast: true,
+    position: 'top',
+    showConfirmButton: false
   })
 }
 
