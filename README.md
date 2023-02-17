@@ -1,6 +1,6 @@
 # AEC CIM Explorer
 
-The sample is using this [GraphiQL project](https://github.com/graphql/graphiql) that makes it really easy to discover the AEC CIM Data API.
+The sample is using the [GraphiQL project](https://github.com/graphql/graphiql) that makes it really easy to discover the AEC CIM Data API.
 It also integrates with the Viewer in order contextualize the query results.
 
 ## Setting up the app
