@@ -28,6 +28,7 @@
   }
 
   async filterModel() {
+    //Return externalIds from query
     let externalIds = await this.retrieveOccurences(queryResponse);
     this.dbidsFromExternalIds(externalIds);
   }
