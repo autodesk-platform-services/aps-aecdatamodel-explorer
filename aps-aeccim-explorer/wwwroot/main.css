@@ -1,0 +1,66 @@
+﻿body, html {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  font-family: ArtifaktElement;
+}
+
+#header {
+  position: absolute;
+}
+
+#header {
+  height: 3em;
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#graphiql {
+  width: 100%;
+  right: 0;
+  padding-top: 3em;
+  bottom: 0;
+  resize: vertical;
+  overflow: auto;
+}
+
+#viewer {
+  width: 100%;
+  right: 0;
+  bottom: 0;
+  height: 30%;
+  visibility: hidden;
+  position: absolute;
+}
+
+#header > * {
+  height: 2em;
+  margin: 0 0.5em;
+}
+
+#login {
+  font-family: ArtifaktElement;
+  font-size: 1em;
+}
+
+#header .title {
+  height: auto;
+  margin-right: auto;
+}
+
+.form-check-input {
+  clear: left;
+}
+
+.form-switch.form-switch-sm {
+  margin-bottom: 0.5rem; /* JUST FOR STYLING PURPOSE */
+}
+
+.form-switch.form-switch-sm .form-check-input {
+  height: 2em;
+  width: calc(2em + 1.5em);
+  border-radius: 2rem;
+}

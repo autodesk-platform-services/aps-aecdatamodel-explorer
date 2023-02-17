@@ -1,0 +1,278 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <title>AEC Cloud Information Model Explorer - BETA</title>
+  <meta charset="utf-8" />
+  <link rel="shortcut icon" href="http://cdn.autodesk.io/favicon.ico">
+  <link rel="mask-icon" href="http://cdn.autodesk.io/favicon.ico">
+  <style>
+    body {
+      height: 100%;
+      margin: 0;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    #graphiql {
+      height: calc(100vh - 3em);
+    }
+  </style>
+  <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-alpha1/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="main.css" />
+  <!-- This link will always fetch the latest version of Balloon.css -->
+  <link rel="stylesheet" href="https://unpkg.com/balloon-css/balloon.min.css">
+  <!--
+    This GraphiQL example depends on Promise and fetch, which are available in
+    modern browsers, but can be "polyfilled" for older browsers.
+    GraphiQL itself depends on React DOM.
+    If you do not want to rely on a CDN, you can host these files locally or
+    include them directly in your favored resource bundler.
+  -->
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+
+  <!--
+    These two files can be found in the npm module, however you may wish to
+    copy them directly into your environment, or perhaps include them in your
+    favored resource bundler.
+   -->
+  <link rel="stylesheet" href="https://unpkg.com/graphiql@2.0.13/graphiql.min.css" />
+</head>
+
+<body>
+  <div id="header">
+    <img class="logo" src="https://cdn.autodesk.io/logo/black/stacked.png" alt="Autodesk Platform Services">
+    <span class="title">AEC Cloud Information Model Explorer - BETA</span>
+    <div id="projectinput" data-balloon-length="fit" aria-label="Project id is fixed for this beta!"
+            data-balloon-pos="down">
+      <input type="text" placeholder="PASTE THE PROJECT ID HERE" value="b.f609fbf7-7959-4832-a379-84028c470d0c" disabled id="projectid" />
+    </div>
+    <div id="iteminput" data-balloon-length="fit" aria-label="Here goes an item/version id like urn:adsk.wipprod:dm.lineage..."
+            data-balloon-pos="down">
+      <input type="text" placeholder="ITEM/VERSION ID HERE" id="modelurn" />
+    </div>
+    <div class="form-check form-switch form-switch-sm">
+      <input class="form-check-input" type="checkbox" id="toggleviewer">
+      <label class="form-check-label" for="toggleviewer" style="margin:0.3em">Viewer</label>
+    </div>
+    <button id="login" style="visibility: hidden;"  data-balloon-length="fit" aria-label="Login Here!"
+            data-balloon-pos="down">Login</button>
+  </div>
+  <div id="graphiql"></div>
+  <div id="viewer"></div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/graphiql@2.0.13/graphiql.min.js" type="application/javascript"></script>
+  <script src="main.js" type="module"></script>
+  <script>
+    var globalViewer = '';
+    var queryResponse = '';
+    let defaultQuery = `query GetDesignEntitiesByProperty{
+    designEntities(filter: { designId: "4e5c860f-ff19-3e2d-8375-89f235be54dd", propertyFilter: { name: "Volume", value: "1.0", operator: LT } }, pagination: { limit: 5 }) {
+        pagination {
+            limit
+            cursor
+        }
+        results {
+            id
+            name
+            properties {
+                results {
+                    name
+                    value
+                }
+            }
+        }
+    }
+}
+`;
+    setInitialTabs();
+
+    function setInitialTabs() {
+      let tabState = JSON.parse(window.localStorage.getItem('graphiql:tabState'));
+      let tutorialTabs = [{ query: 'Task 1' }, { query: 'Task 2' }, { query: 'Task 3' }, { query: 'Task 4' }].map(ensureTutorialTab);
+      if (!!tabState) {
+        let nonTutorialTabs = tabState.tabs.filter(tab => !tab.query.match(/Task 1 – Pick a Hub|Task 2 – Pick a Projects|Task 3 – Navigate to folders and designs with in a project|Task 4 – Get Design Entities within a design using properties filter/g))
+        tabState.tabs = tutorialTabs.concat(nonTutorialTabs);
+      }
+      else {
+        tabState = {
+          activeTabIndex: 0,
+          tabs: []
+        };
+        tabState.tabs.push(...tutorialTabs);
+      }
+      let tabStateString = JSON.stringify(tabState);
+      window.localStorage.setItem('graphiql:tabState', tabStateString);
+
+    }
+
+    function generateUUID() {
+      let
+        d = new Date().getTime(),
+        d2 = (performance && performance.now && (performance.now() * 1000)) || 0;
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        let r = Math.random() * 16;
+        if (d > 0) {
+          r = (d + r) % 16 | 0;
+          d = Math.floor(d / 16);
+        } else {
+          r = (d2 + r) % 16 | 0;
+          d2 = Math.floor(d2 / 16);
+        }
+        return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
+      });
+    };
+
+
+    function ensureTutorialTab(tab) {
+      let task = tab.query;
+      tab.hash = null;
+      tab.headers = null;
+      tab.id = generateUUID();
+      tab.operationName = null;
+      tab.response = null;
+      tab.variables = null;
+      switch (task) {
+        case 'Task 1':
+          tab.title = 'GetHubs';
+          tab.query = `# Task 1 – Pick a Hub
+query GetHubs {
+  hubs {
+    results {
+      name
+      id
+    }
+  }
+}`;
+          break;
+        case 'Task 2':
+          tab.title = 'GetProjects';
+          tab.query = `# Task 2 – Pick a Projects
+query GetProjects {
+projects(hubId: "b.768cae14-76b3-4531-9030-25212dab4e48") {
+    results {
+    id
+    name
+    }
+ }
+}`;
+          break;
+        case 'Task 3':
+          tab.title = 'GetDesigns';
+          tab.query = `# Task 3 – Navigate to folders and designs with in a project
+query GetDesigns {
+        project(
+            hubId: "b.768cae14-76b3-4531-9030-25212dab4e48"
+            projectId: "b.f609fbf7-7959-4832-a379-84028c470d0c"
+        ) {
+            id
+            name
+            folders {
+            results {
+                id
+                name
+                items {
+                results {
+                    id
+                    name
+                    __typename
+                    ... on BasicFile {
+                    designId
+                    name
+                    }
+                }
+            }
+        }
+      }
+    }
+}`;
+          break;
+        case 'Task 4':
+          tab.title = 'GetDesignEntities';
+          tab.query = `# Task 4 – Get Design Entities within a design using properties filter
+query GetDesignEntities {
+  designEntities(
+    filter: {designId: "4e5c860f-ff19-3e2d-8375-89f235be54dd", propertyFilter: {name: "family", value: "Basic Wall"}}
+ ) {
+    pagination {
+    cursor
+    limit
+    }
+    results {
+    id
+    name
+    classification{
+        category
+    }
+    properties {
+        results {
+        name
+        value
+        }
+    }
+    }
+ }
+}`;
+          break;
+      }
+      return tab;
+    }
+
+    async function graphQLFetcher(graphQLParams, opts) {
+      // check if existing token still valid, if not refresh
+      let res = await fetch(`api/auth/token`);
+      let resJSON = await res.json();
+      accessToken = resJSON.access_token;
+      if (accessToken === undefined) {
+        showHelpers('login');
+        return 'Please login first';
+      }
+
+      const { headers = {} } = opts;
+      return fetch(
+        "https://developer.api.autodesk.com/aeccloudinformationmodel/2022-11/graphql",
+        {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + accessToken,
+            ...headers,
+          },
+          body: JSON.stringify(graphQLParams),
+        }
+      ).then(async (response) => {
+        queryResponse = await response.json();
+        if (!!globalViewer) {
+          globalViewer.getExtension('AIMFilterExtension').filterModel();
+        }
+        return queryResponse;
+      });
+    }
+
+    function onTabs(data) {
+      console.log(data)
+    }
+
+    async function showHelpers(elementId) {
+      let itemInput = document.getElementById(elementId);
+      itemInput.setAttribute('data-balloon-visible', '');
+      setTimeout(() => { itemInput.removeAttribute('data-balloon-visible', ''); }, 5000);
+    }
+
+    ReactDOM.render(
+      React.createElement(GraphiQL, {
+        fetcher: graphQLFetcher,
+        defaultEditorToolsVisibility: true,
+        onTabs: onTabs,
+        query: defaultQuery,
+        defaultQuery: { defaultQuery }
+      }),
+      document.getElementById('graphiql'),
+    );
+  </script>
+  <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.js"></script>
+</body>
+
+</html>
