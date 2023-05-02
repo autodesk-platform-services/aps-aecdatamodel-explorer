@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>AEC Data Model Explorer - BETA</title>
+  <title>AEC Cloud Information Model Explorer - BETA</title>
   <meta charset="utf-8" />
   <link rel="shortcut icon" href="http://cdn.autodesk.io/favicon.ico">
   <link rel="mask-icon" href="http://cdn.autodesk.io/favicon.ico">
@@ -45,11 +45,10 @@
 <body>
   <div id="header">
     <img class="logo" src="https://cdn.autodesk.io/logo/black/stacked.png" alt="Autodesk Platform Services">
-    <span class="title">AEC Data Model Explorer - BETA</span>
-    <div id="projectinput" data-balloon-length="fit" aria-label="Project id is fixed for this beta!"
+    <span class="title">AEC Cloud Information Model Explorer - BETA</span>
+    <div id="projectinput" data-balloon-length="fit" aria-label="Here goes a project id like b.f609fbf7..."
       data-balloon-pos="down">
-      <input type="text" placeholder="PASTE THE PROJECT ID HERE" value="b.f609fbf7-7959-4832-a379-84028c470d0c" disabled
-        id="projectid" />
+      <input type="text" placeholder="PASTE THE PROJECT ID HERE" id="projectid" />
     </div>
     <div id="iteminput" data-balloon-length="fit"
       aria-label="Here goes an item/version id like urn:adsk.wipprod:dm.lineage..." data-balloon-pos="down">
@@ -70,10 +69,9 @@
   <script>
     var globalViewer = '';
     var queryResponse = '';
-    let defaultQuery = `query GetDesignEntitiesByProperty{
-    designEntities(filter: { designId: "4e5c860f-ff19-3e2d-8375-89f235be54dd", propertyFilter: { name: "Volume", value: "1.0", operator: LT } }, pagination: { limit: 5 }) {
+    let defaultQuery = `query GetElementsByFilter{
+    elements(designId: "yourdesignid", filter: {query:"yourfilter"}) {
         pagination {
-            limit
             cursor
         }
         results {
@@ -95,7 +93,7 @@
       let tabState = JSON.parse(window.localStorage.getItem('graphiql:tabState'));
       let tutorialTabs = [{ query: 'Task 1' }, { query: 'Task 2' }, { query: 'Task 3' }, { query: 'Task 4' }].map(ensureTutorialTab);
       if (!!tabState) {
-        let nonTutorialTabs = tabState.tabs.filter(tab => !tab.query.match(/Task 1 – Pick a Hub|Task 2 – Pick a Projects|Task 3 – Navigate to folders and designs with in a project|Task 4 – Get Design Entities within a design using properties filter/g))
+        let nonTutorialTabs = tabState.tabs.filter(tab => !tab.query.match(/Task 1 – Pick a Hub|Task 2 – Pick Project|Task 3 – Retrieve designs from project|Task 4 – Get Elements within a design using a filter/g))
         tabState.tabs = tutorialTabs.concat(nonTutorialTabs);
       }
       else {
@@ -142,6 +140,9 @@
           tab.query = `# Task 1 – Pick a Hub
 query GetHubs {
   hubs {
+    pagination {
+      cursor
+    }
     results {
       name
       id
@@ -151,71 +152,53 @@ query GetHubs {
           break;
         case 'Task 2':
           tab.title = 'GetProjects';
-          tab.query = `# Task 2 – Pick a Projects
+          tab.query = `# Task 2 – Pick Projects
 query GetProjects {
-projects(hubId: "b.768cae14-76b3-4531-9030-25212dab4e48") {
-    results {
-    id
-    name
+  projects(hubId: "yourhubid") {
+    pagination {
+      cursor
     }
- }
+    results {
+      id
+      name
+    }
+  }
 }`;
           break;
         case 'Task 3':
-          tab.title = 'GetDesigns';
-          tab.query = `# Task 3 – Navigate to folders and designs with in a project
-query GetDesigns {
-        project(
-            hubId: "b.768cae14-76b3-4531-9030-25212dab4e48"
-            projectId: "b.f609fbf7-7959-4832-a379-84028c470d0c"
-        ) {
-            id
-            name
-            folders {
-            results {
-                id
-                name
-                items {
-                results {
-                    id
-                    name
-                    __typename
-                    ... on BasicFile {
-                    designId
-                    name
-                    }
-                }
-            }
-        }
-      }
+          tab.title = 'GetDesignsByProject';
+          tab.query = `# Task 3 – Retrieve designs from project
+query GetDesignsByProject {
+  aecDesignsByProject(projectId: "yourprojectid") {
+    pagination {
+      cursor
     }
+    results{
+      name
+      id
+    }
+  }
 }`;
           break;
         case 'Task 4':
-          tab.title = 'GetDesignEntities';
-          tab.query = `# Task 4 – Get Design Entities within a design using properties filter
-query GetDesignEntities {
-  designEntities(
-    filter: {designId: "4e5c860f-ff19-3e2d-8375-89f235be54dd", propertyFilter: {name: "family", value: "Basic Wall"}}
- ) {
+          tab.title = 'GetElementsFromCategory';
+          tab.query = `# Task 4 – Get Elements within a design using a filter
+query GetElementsFromCategory {
+  elements(designId: "yourdesignid", filter: {query:"property.name.category==Walls"}) {
     pagination {
-    cursor
-    limit
+      cursor
     }
     results {
-    id
-    name
-    classification{
-        category
-    }
-    properties {
+      id
+      name
+      properties {
         results {
-        name
-        value
+          name
+          value
         }
+      }
     }
-    }
- }
+  } 
 }`;
           break;
       }
