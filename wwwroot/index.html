@@ -161,6 +161,9 @@ query GetProjects {
     results {
       id
       name
+      alternativeRepresentations{
+				externalProjectId
+			}
     }
   }
 }`;
@@ -176,6 +179,10 @@ query GetDesignsByProject {
     results{
       name
       id
+      alternativeRepresentations{
+				fileUrn
+				fileVersionUrn
+			}
     }
   }
 }`;

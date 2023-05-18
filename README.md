@@ -20,8 +20,6 @@ It also integrates with the Viewer in order contextualize the query results.
 
 ## Running the app
 
-
-
 As instructed in the console, you'll need to open a web browser and navigate to http://localhost:8080 in order to log into your Autodesk account
 
 ## Output

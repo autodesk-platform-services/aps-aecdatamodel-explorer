@@ -64,12 +64,12 @@
   async retrieveOccurences(jsonResponse) {
     //Here we use a regex to handle the json as an array of strings
     let stringArrayResponse = JSON.stringify(jsonResponse).replace(/{|}|\[|\]/g, '|').split('|');
-    let sourceIdIndex = stringArrayResponse.findIndex(s => s.includes('sourceId'));
+    let sourceIdIndex = stringArrayResponse.findIndex(s => s.includes('External ID'));
     let externalIds = [];
     while (sourceIdIndex != -1) {
       externalIds.push(JSON.parse(`{${stringArrayResponse[sourceIdIndex]}}`).value);
       stringArrayResponse.splice(sourceIdIndex, 1);
-      sourceIdIndex = stringArrayResponse.findIndex(s => s.includes('sourceId'));
+      sourceIdIndex = stringArrayResponse.findIndex(s => s.includes('External ID'));
     }
     return externalIds.filter(i => !!i);
   }
