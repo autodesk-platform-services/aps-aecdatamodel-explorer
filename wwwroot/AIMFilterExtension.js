@@ -55,7 +55,7 @@
         if (!!dbid)
           dbids.push(dbid);
       });
-      let leafNodesIds = dbids.filter(dbid => this.leafNodes.includes(dbid));
+      // let leafNodesIds = dbids.filter(dbid => this.leafNodes.includes(dbid));
       this.viewer.isolate(leafNodesIds);
       this.viewer.fitToView();
     }, console.log)
