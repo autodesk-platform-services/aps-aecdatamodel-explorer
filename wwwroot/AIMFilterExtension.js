@@ -68,9 +68,15 @@
     let sourceIdIndex = stringArrayResponse.findIndex(s => s.includes('External ID'));
     let externalIds = [];
     while (sourceIdIndex != -1) {
-      externalIds.push(JSON.parse(`{${stringArrayResponse[sourceIdIndex]}}`).value);
-      stringArrayResponse.splice(sourceIdIndex, 1);
-      sourceIdIndex = stringArrayResponse.findIndex(s => s.includes('External ID'));
+      try {
+        externalIds.push(JSON.parse(`{${stringArrayResponse[sourceIdIndex]}}`).value);
+        stringArrayResponse.splice(sourceIdIndex, 1);
+        sourceIdIndex = stringArrayResponse.findIndex(s => s.includes('External ID'));
+      }
+      catch (error) {
+        console.log('not able to filter one external id');
+        console.log(error);
+      }
     }
     return externalIds.filter(i => !!i);
   }
