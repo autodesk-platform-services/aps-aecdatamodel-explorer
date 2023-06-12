@@ -235,8 +235,9 @@ query GetElementsFromCategory {
           body: JSON.stringify(graphQLParams),
         }
       ).then(async (response) => {
+        const viewerToggle = document.getElementById('toggleviewer');
         queryResponse = await response.json();
-        if (!!globalViewer) {
+        if (!!globalViewer && viewerToggle.checked) {
           globalViewer.getExtension('AIMFilterExtension').filterModel();
         }
         return queryResponse;
