@@ -535,3 +535,4 @@ FodyWeavers.xsd
 *.sln.iml
 aps-aeccim-explorer/appsettings.Development.json
 aps-aeccim-explorer/appsettings.Development.json
+appsettings.Development.json
