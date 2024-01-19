@@ -27,17 +27,7 @@ public class AuthController : ControllerBase
 		{
 			PublicToken = request.Cookies["public_token"],
 			InternalToken = request.Cookies["internal_token"],
-			RefreshToken = request.Cookies["refresh_token"],
-			ExpiresAt = DateTime.Parse(request.Cookies["expires_at"])
 		};
-		if (tokens.ExpiresAt < DateTime.Now.ToUniversalTime())
-		{
-			tokens = await forgeService.RefreshTokens(tokens);
-			response.Cookies.Append("public_token", tokens.PublicToken);
-			response.Cookies.Append("internal_token", tokens.InternalToken);
-			response.Cookies.Append("refresh_token", tokens.RefreshToken);
-			response.Cookies.Append("expires_at", tokens.ExpiresAt.ToString());
-		}
 		return tokens;
 	}
 
@@ -53,19 +43,14 @@ public class AuthController : ControllerBase
 	{
 		Response.Cookies.Delete("public_token");
 		Response.Cookies.Delete("internal_token");
-		Response.Cookies.Delete("refresh_token");
-		Response.Cookies.Delete("expires_at");
 		return Redirect("/");
 	}
 
-	[HttpGet("callback")]
-	public async Task<ActionResult> Callback(string code)
+	[HttpGet("addtoken")]
+	public async Task<ActionResult> Callback(string token)
 	{
-		var tokens = await _forgeService.GenerateTokens(code);
-		Response.Cookies.Append("public_token", tokens.PublicToken);
-		Response.Cookies.Append("internal_token", tokens.InternalToken);
-		Response.Cookies.Append("refresh_token", tokens.RefreshToken);
-		Response.Cookies.Append("expires_at", tokens.ExpiresAt.ToString());
+		Response.Cookies.Append("public_token", token);
+		Response.Cookies.Append("internal_token", token);
 		return Redirect("/");
 	}
 
@@ -95,8 +80,7 @@ public class AuthController : ControllerBase
 		return new
 		{
 			access_token = tokens.PublicToken,
-			token_type = "Bearer",
-			expires_in = Math.Floor((tokens.ExpiresAt - DateTime.Now.ToUniversalTime()).TotalSeconds)
+			token_type = "Bearer"
 		};
 	}
 }

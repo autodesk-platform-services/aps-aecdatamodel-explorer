@@ -3,6 +3,8 @@
 The sample is using the [GraphiQL project](https://github.com/graphql/graphiql) that makes it really easy to discover the AEC CIM Data API.
 It also integrates with the Viewer in order contextualize the query results.
 
+In this specific branch we don't manage authentication, but instead it expects the user to input a token
+
 ## Setting up the app
 
 - clone this repository or download
@@ -16,6 +18,7 @@ It also integrates with the Viewer in order contextualize the query results.
   "APS_CALLBACK_URL": "http://localhost:8080/api/auth/callback"
 }
 ```
+
 **Make sure your APS app also uses the same callback url!**
 
 ## Running the app

@@ -46,7 +46,23 @@ window.addEventListener("load", async () => {
       login.onclick = () => window.location.replace('/api/auth/logout');
     } else {
       login.innerText = 'Login';
-      login.onclick = () => window.location.replace('/api/auth/login');
+      login.onclick = async () => {
+        //Swal to specifi parameter to obtain and filter to generate the chart
+        const { value: token } = await Swal.fire({
+          title: 'Paste your token below',
+          html:
+            `<span>Access Token</span><input type="text" id="token" class="swal2-input" style="font-size: 0.8em; width: 300px; margin-left: 80px;" placeholder="Your token goes here!">`,
+          focusConfirm: false,
+          preConfirm: () => {
+            return [
+              document.getElementById('token').value
+            ]
+          }
+        });
+
+        await fetch(`/api/auth/addtoken?token=${token[0]}`);
+        window.location.href = "/";
+      }
     }
     login.style.visibility = 'visible';
   } catch (err) {

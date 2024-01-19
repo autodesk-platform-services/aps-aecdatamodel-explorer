@@ -16,22 +16,7 @@ public partial class ForgeService
 		return new Tokens
 		{
 			PublicToken = publicAuth.access_token,
-			InternalToken = internalAuth.access_token,
-			RefreshToken = publicAuth.refresh_token,
-			ExpiresAt = DateTime.Now.ToUniversalTime().AddSeconds(internalAuth.expires_in)
-		};
-	}
-
-	public async Task<Tokens> RefreshTokens(Tokens tokens)
-	{
-		dynamic internalAuth = await new ThreeLeggedApi().RefreshtokenAsync(_clientId, _clientSecret, "refresh_token", tokens.RefreshToken, InternalTokenScopes);
-		dynamic publicAuth = await new ThreeLeggedApi().RefreshtokenAsync(_clientId, _clientSecret, "refresh_token", internalAuth.refresh_token, PublicTokenScopes);
-		return new Tokens
-		{
-			PublicToken = publicAuth.access_token,
-			InternalToken = internalAuth.access_token,
-			RefreshToken = publicAuth.refresh_token,
-			ExpiresAt = DateTime.Now.ToUniversalTime().AddSeconds(internalAuth.expires_in).AddSeconds(-1700)
+			InternalToken = internalAuth.access_token
 		};
 	}
 
