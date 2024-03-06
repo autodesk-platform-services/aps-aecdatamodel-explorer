@@ -25,7 +25,7 @@ public class Startup
 		{
 			throw new ApplicationException("Missing required environment variables APS_CLIENT_ID, APS_CLIENT_SECRET, or APS_CALLBACK_URL.");
 		}
-		services.AddSingleton<ForgeService>(new ForgeService(ForgeClientID, ForgeClientSecret, ForgeCallbackURL));
+		services.AddSingleton<APSService>(new APSService(ForgeClientID, ForgeClientSecret, ForgeCallbackURL));
 	}
 
 	// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

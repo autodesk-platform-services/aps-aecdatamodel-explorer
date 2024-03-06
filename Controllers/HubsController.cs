@@ -8,23 +8,23 @@ using Newtonsoft.Json;
 public class HubsController : ControllerBase
 {
 	private readonly ILogger<HubsController> _logger;
-	private readonly ForgeService _forgeService;
+	private readonly APSService _apsService;
 
-	public HubsController(ILogger<HubsController> logger, ForgeService forgeService)
+	public HubsController(ILogger<HubsController> logger, APSService forgeService)
 	{
 		_logger = logger;
-		_forgeService = forgeService;
+		_apsService = forgeService;
 	}
 
 	[HttpGet("{project}/contents/{item}/versions")]
 	public async Task<ActionResult<string>> ListVersions(string project, string item)
 	{
-		var tokens = await AuthController.PrepareTokens(Request, Response, _forgeService);
+		var tokens = await AuthController.PrepareTokens(Request, Response, _apsService);
 		if (tokens == null)
 		{
 			return Unauthorized();
 		}
-		var versions = await _forgeService.GetVersions(project, item, tokens);
+		var versions = await _apsService.GetVersions(project, item, tokens);
 		return JsonConvert.SerializeObject(versions);
 	}
 }

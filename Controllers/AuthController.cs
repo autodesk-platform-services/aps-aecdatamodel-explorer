@@ -9,15 +9,15 @@ using Microsoft.Extensions.Logging;
 public class AuthController : ControllerBase
 {
 	private readonly ILogger<AuthController> _logger;
-	private readonly ForgeService _forgeService;
+	private readonly APSService _apsService;
 
-	public AuthController(ILogger<AuthController> logger, ForgeService forgeService)
+	public AuthController(ILogger<AuthController> logger, APSService forgeService)
 	{
 		_logger = logger;
-		_forgeService = forgeService;
+		_apsService = forgeService;
 	}
 
-	public static async Task<Tokens> PrepareTokens(HttpRequest request, HttpResponse response, ForgeService forgeService)
+	public static async Task<Tokens> PrepareTokens(HttpRequest request, HttpResponse response, APSService forgeService)
 	{
 		if (!request.Cookies.ContainsKey("internal_token"))
 		{
@@ -44,7 +44,7 @@ public class AuthController : ControllerBase
 	[HttpGet("login")]
 	public ActionResult Login()
 	{
-		var redirectUri = _forgeService.GetAuthorizationURL();
+		var redirectUri = _apsService.GetAuthorizationURL();
 		return Redirect(redirectUri);
 	}
 
@@ -61,7 +61,7 @@ public class AuthController : ControllerBase
 	[HttpGet("callback")]
 	public async Task<ActionResult> Callback(string code)
 	{
-		var tokens = await _forgeService.GenerateTokens(code);
+		var tokens = await _apsService.GenerateTokens(code);
 		Response.Cookies.Append("public_token", tokens.PublicToken);
 		Response.Cookies.Append("internal_token", tokens.InternalToken);
 		Response.Cookies.Append("refresh_token", tokens.RefreshToken);
@@ -72,12 +72,12 @@ public class AuthController : ControllerBase
 	[HttpGet("profile")]
 	public async Task<dynamic> GetProfile()
 	{
-		var tokens = await PrepareTokens(Request, Response, _forgeService);
+		var tokens = await PrepareTokens(Request, Response, _apsService);
 		if (tokens == null)
 		{
 			return Unauthorized();
 		}
-		dynamic profile = await _forgeService.GetUserProfile(tokens);
+		dynamic profile = await _apsService.GetUserProfile(tokens);
 		return new
 		{
 			name = string.Format("{0} {1}", profile.firstName, profile.lastName)
@@ -87,7 +87,7 @@ public class AuthController : ControllerBase
 	[HttpGet("token")]
 	public async Task<dynamic> GetPublicToken()
 	{
-		var tokens = await PrepareTokens(Request, Response, _forgeService);
+		var tokens = await PrepareTokens(Request, Response, _apsService);
 		if (tokens == null)
 		{
 			return Unauthorized();
