@@ -1,7 +1,7 @@
 ﻿import { initViewer, loadModel } from './viewer.js'
 
 window.addEventListener("load", async () => {
-  const login = document.getElementById('login');
+  const signin = document.getElementById('signin');
   const urnInput = document.getElementById('modelurn');
   const projectidInput = document.getElementById('projectid');
   const viewerToggle = document.getElementById('toggleviewer');
@@ -33,7 +33,7 @@ window.addEventListener("load", async () => {
     } catch (error) {
       showToast(`Please, ensure you're logged in and using a valid item/version ID!`);
       showHelpers('iteminput');
-      showHelpers('login');
+      showHelpers('signin');
       console.error(error);
       cb.target.checked = false;
     }
@@ -42,13 +42,13 @@ window.addEventListener("load", async () => {
     const resp = await fetch('/api/auth/profile');
     if (resp.ok) {
       const user = await resp.json();
-      login.innerText = `Logout (${user.name})`;
-      login.onclick = () => window.location.replace('/api/auth/logout');
+      signin.innerText = `Sign Out (${user.name})`;
+      signin.onclick = () => window.location.replace('/api/auth/signout');
     } else {
-      login.innerText = 'Login';
-      login.onclick = () => window.location.replace('/api/auth/login');
+      signin.innerText = 'Sign In';
+      signin.onclick = () => window.location.replace('/api/auth/signin');
     }
-    login.style.visibility = 'visible';
+    signin.style.visibility = 'visible';
   } catch (err) {
     alert('Could not initialize the application. See console for more details.');
     console.error(err);

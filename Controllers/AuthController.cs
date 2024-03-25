@@ -41,15 +41,15 @@ public class AuthController : ControllerBase
 		return tokens;
 	}
 
-	[HttpGet("login")]
-	public ActionResult Login()
+	[HttpGet("signin")]
+	public ActionResult Signin()
 	{
 		var redirectUri = _apsService.GetAuthorizationURL();
 		return Redirect(redirectUri);
 	}
 
-	[HttpGet("logout")]
-	public ActionResult Logout()
+	[HttpGet("signout")]
+	public ActionResult Signout()
 	{
 		Response.Cookies.Delete("public_token");
 		Response.Cookies.Delete("internal_token");
