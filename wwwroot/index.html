@@ -45,11 +45,7 @@
 <body>
   <div id="header">
     <img class="logo" src="https://cdn.autodesk.io/logo/black/stacked.png" alt="Autodesk Platform Services">
-    <span class="title">AEC Data Model Explorer - BETA</span>
-    <div id="projectinput" data-balloon-length="fit" aria-label="Here goes a project id like b.f609fbf7..."
-      data-balloon-pos="down">
-      <input type="text" placeholder="PASTE THE PROJECT ID HERE" id="projectid" />
-    </div>
+    <span class="title">AEC Data Model Explorer</span>
     <div id="iteminput" data-balloon-length="fit"
       aria-label="Here goes an item/version id like urn:adsk.wipprod:dm.lineage..." data-balloon-pos="down">
       <input type="text" placeholder="ITEM/VERSION ID HERE" id="modelurn" />
@@ -78,7 +74,7 @@
     var globalViewer = '';
     var queryResponse = '';
     let defaultQuery = `query GetElementsByFilter{
-      elements(elementGroupId: "yourdesignid", filter: {query:"yourfilter"}) {
+      elementsByElementGroup(elementGroupId: "yourdesignid", filter: {query:"yourfilter"}) {
         pagination {
             cursor
         }
@@ -194,7 +190,7 @@ query GetDesignsByProject {
           tab.title = 'GetElementsFromCategory';
           tab.query = `# Task 4 – Get Elements within a design using a filter
 query GetElementsFromCategory {
-      elements(elementGroupId: "yourdesignid", filter: {query:"property.name.category==Walls"}) {
+  elementsByElementGroup(elementGroupId: "yourdesignid", filter: {query:"property.name.category==Walls"}) {
       pagination {
         cursor
       }
@@ -227,7 +223,7 @@ query GetElementsFromCategory {
 
       const { headers = {} } = opts;
       return fetch(
-        "https://developer.api.autodesk.com/beta/graphql",
+        "https://developer.api.autodesk.com/aec/graphql",
         {
           method: "post",
           headers: {

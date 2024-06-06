@@ -48,7 +48,7 @@
       let resJSON = await res.json();
       accessToken = resJSON.access_token;
       const response = await fetch(
-        "https://developer.api.autodesk.com/beta/graphql",
+        "https://developer.api.autodesk.com/aec/graphql",
         {
           method: 'post',
           headers: {
