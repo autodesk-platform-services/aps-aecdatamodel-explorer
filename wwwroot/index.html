@@ -78,7 +78,6 @@
     var globalViewer = '';
     var queryResponse = '';
     let defaultQuery = `query GetElementsByFilter{
-    aec{
       elements(elementGroupId: "yourdesignid", filter: {query:"yourfilter"}) {
         pagination {
             cursor
@@ -93,7 +92,6 @@
                 }
             }
         }
-      }
     }`;
     setInitialTabs();
 
@@ -147,7 +145,6 @@
           tab.title = 'GetHubs';
           tab.query = `# Task 1 – Pick a Hub
 query GetHubs {
-  nav{
     hubs {
       pagination {
         cursor
@@ -157,14 +154,12 @@ query GetHubs {
         id
       }
     }
-  }
 }`;
           break;
         case 'Task 2':
           tab.title = 'GetProjects';
           tab.query = `# Task 2 – Pick Projects
 query GetProjects {
-  nav{
     projects(hubId: "yourhubid") {
       pagination {
         cursor
@@ -174,14 +169,12 @@ query GetProjects {
         name
       }
     }
-  }
 }`;
           break;
         case 'Task 3':
           tab.title = 'GetDesignsByProject';
           tab.query = `# Task 3 – Retrieve designs from project
 query GetDesignsByProject {
-  aec{
     elementGroupsByProject(projectId: "yourprojectid") {
       pagination {
         cursor
@@ -195,14 +188,12 @@ query GetDesignsByProject {
         }
       }
     }
-  }
 }`;
           break;
         case 'Task 4':
           tab.title = 'GetElementsFromCategory';
           tab.query = `# Task 4 – Get Elements within a design using a filter
 query GetElementsFromCategory {
-  aec{
       elements(elementGroupId: "yourdesignid", filter: {query:"property.name.category==Walls"}) {
       pagination {
         cursor
@@ -218,7 +209,6 @@ query GetElementsFromCategory {
         }
       }
     }
-  } 
 }`;
           break;
       }
