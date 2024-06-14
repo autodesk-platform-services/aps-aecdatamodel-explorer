@@ -45,7 +45,11 @@
 <body>
   <div id="header">
     <img class="logo" src="https://cdn.autodesk.io/logo/black/stacked.png" alt="Autodesk Platform Services">
-    <span class="title">AEC Data Model Explorer</span>
+    <span class="title">AEC Data Model Explorer - BETA</span>
+    <div id="projectinput" data-balloon-length="fit" aria-label="Here goes a project id like b.f609fbf7..."
+      data-balloon-pos="down">
+      <input type="text" placeholder="PASTE THE PROJECT ID HERE" id="projectid" />
+    </div>
     <div id="iteminput" data-balloon-length="fit"
       aria-label="Here goes an item/version id like urn:adsk.wipprod:dm.lineage..." data-balloon-pos="down">
       <input type="text" placeholder="ITEM/VERSION ID HERE" id="modelurn" />
@@ -54,14 +58,6 @@
       <input class="form-check-input" type="checkbox" id="toggleviewer">
       <label class="form-check-label" for="toggleviewer" style="margin:0.3em">Viewer</label>
     </div>
-    <a type="button" class="btn btn-light mr-3" target="_blank" href="/voyager.html">
-      <img src="voyager.svg"  
-        class="header-button"
-        width="24"
-        height="24" 
-        title="Voyager" 
-      />&nbsp;Voyager
-    </a>
     <button id="signin" style="visibility: hidden;" data-balloon-length="fit" aria-label="Sign In Here!"
       data-balloon-pos="down">Sign In</button>
   </div>
@@ -74,7 +70,7 @@
     var globalViewer = '';
     var queryResponse = '';
     let defaultQuery = `query GetElementsByFilter{
-      elementsByElementGroup(elementGroupId: "yourdesignid", filter: {query:"yourfilter"}) {
+    elements(designId: "yourdesignid", filter: {query:"yourfilter"}) {
         pagination {
             cursor
         }
@@ -88,7 +84,9 @@
                 }
             }
         }
-    }`;
+    }
+}
+`;
     setInitialTabs();
 
     function setInitialTabs() {
@@ -141,70 +139,73 @@
           tab.title = 'GetHubs';
           tab.query = `# Task 1 – Pick a Hub
 query GetHubs {
-    hubs {
-      pagination {
-        cursor
-      }
-      results {
-        name
-        id
-      }
+  hubs {
+    pagination {
+      cursor
     }
+    results {
+      name
+      id
+    }
+  }
 }`;
           break;
         case 'Task 2':
           tab.title = 'GetProjects';
           tab.query = `# Task 2 – Pick Projects
 query GetProjects {
-    projects(hubId: "yourhubid") {
-      pagination {
-        cursor
-      }
-      results {
-        id
-        name
-      }
+  projects(hubId: "yourhubid") {
+    pagination {
+      cursor
     }
+    results {
+      id
+      name
+      alternativeRepresentations{
+				externalProjectId
+			}
+    }
+  }
 }`;
           break;
         case 'Task 3':
           tab.title = 'GetDesignsByProject';
           tab.query = `# Task 3 – Retrieve designs from project
 query GetDesignsByProject {
-    elementGroupsByProject(projectId: "yourprojectid") {
-      pagination {
-        cursor
-      }
-      results{
-        name
-        id
-        alternativeIdentifiers{
-          fileUrn
-          fileVersionUrn
-        }
-      }
+  aecDesignsByProject(projectId: "yourprojectid") {
+    pagination {
+      cursor
     }
+    results{
+      name
+      id
+      alternativeRepresentations{
+				fileUrn
+				fileVersionUrn
+			}
+    }
+  }
 }`;
           break;
         case 'Task 4':
           tab.title = 'GetElementsFromCategory';
           tab.query = `# Task 4 – Get Elements within a design using a filter
 query GetElementsFromCategory {
-  elementsByElementGroup(elementGroupId: "yourdesignid", filter: {query:"property.name.category==Walls"}) {
-      pagination {
-        cursor
-      }
-      results {
-        id
-        name
-        properties {
-          results {
-            name
-            value
-          }
+  elements(designId: "yourdesignid", filter: {query:"property.name.category==Walls"}) {
+    pagination {
+      cursor
+    }
+    results {
+      id
+      name
+      properties {
+        results {
+          name
+          value
         }
       }
     }
+  } 
 }`;
           break;
       }
@@ -217,13 +218,13 @@ query GetElementsFromCategory {
       let resJSON = await res.json();
       accessToken = resJSON.access_token;
       if (accessToken === undefined) {
-        showHelpers('sign in');
-        return 'Please sign in first';
+        showHelpers('login');
+        return 'Please login first';
       }
 
       const { headers = {} } = opts;
       return fetch(
-        "https://developer.api.autodesk.com/aec/graphql",
+        "https://developer.api.autodesk.com/aecdatamodel/graphql",
         {
           method: "post",
           headers: {

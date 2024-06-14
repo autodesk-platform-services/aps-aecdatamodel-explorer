@@ -1,4 +1,4 @@
-﻿class AECDMFilterExtension extends Autodesk.Viewing.Extension {
+﻿class AIMFilterExtension extends Autodesk.Viewing.Extension {
   constructor(viewer, options) {
     super(viewer, options);
     this._button = null;
@@ -23,7 +23,7 @@
   }
 
   onToolbarCreated() {
-    this._button = this.createToolbarButton('aecdmfilterextension-button', 'https://img.icons8.com/ios-glyphs/30/null/empty-filter.png', 'Filter Model Based on Query');
+    this._button = this.createToolbarButton('aimfilterextension-button', 'https://img.icons8.com/ios-glyphs/30/null/empty-filter.png', 'Filter Model Based on Query');
     this._button.onClick = this.filterModel.bind(this);
   }
 
@@ -84,9 +84,9 @@
   }
 
   createToolbarButton(buttonId, buttonIconUrl, buttonTooltip) {
-    let group = this.viewer.toolbar.getControl('aecdm-toolbar-group');
+    let group = this.viewer.toolbar.getControl('aim-toolbar-group');
     if (!group) {
-      group = new Autodesk.Viewing.UI.ControlGroup('aecdm-toolbar-group');
+      group = new Autodesk.Viewing.UI.ControlGroup('aim-toolbar-group');
       this.viewer.toolbar.addControl(group);
     }
     const button = new Autodesk.Viewing.UI.Button(buttonId);
@@ -103,9 +103,9 @@
   }
 
   removeToolbarButton(button) {
-    const group = this.viewer.toolbar.getControl('aecdm-toolbar-group');
+    const group = this.viewer.toolbar.getControl('aim-toolbar-group');
     group.removeControl(button);
   }
 }
 
-Autodesk.Viewing.theExtensionManager.registerExtension('AECDMFilterExtension', AECDMFilterExtension);
+Autodesk.Viewing.theExtensionManager.registerExtension('AIMFilterExtension', AIMFilterExtension);

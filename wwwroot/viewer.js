@@ -1,5 +1,5 @@
 ﻿/// import * as Autodesk from "@types/forge-viewer";
-import './AECDMFilterExtension.js'
+import './AIMFilterExtension.js'
 
 async function getAccessToken(callback) {
   try {
@@ -20,7 +20,7 @@ export function initViewer(container) {
     Autodesk.Viewing.Initializer({ getAccessToken }, async function () {
       const config = {
         extensions: [
-          'AECDMFilterExtension',
+          'AIMFilterExtension',
           'Autodesk.DocumentBrowser'
         ]
       }
