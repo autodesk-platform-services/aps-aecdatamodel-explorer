@@ -7,6 +7,8 @@ window.addEventListener("load", async () => {
   const viewerToggle = document.getElementById('toggleviewer');
   const viewerDiv = document.getElementById('viewer');
   const graphiqlDiv = document.getElementById('graphiql');
+  const help = document.getElementById('help');
+  help.onclick = showHelpDialog;
   new ResizeObserver(() => {
     viewerDiv.style.height = `calc( ${document.body.scrollHeight}px - (1em + ${graphiqlDiv.clientHeight}px))`;
     if(!!globalViewer)
@@ -54,6 +56,20 @@ window.addEventListener("load", async () => {
     console.error(err);
   }
 })
+
+async function showHelpDialog() {
+  Swal.fire({
+    title: '<strong>Helpers</strong>',
+    html:
+      "<ul style='list-style-type:none; font-size:medium'> <li><a target='_blank' href='//tutorials.autodesk.io/#provision-access-in-other-products'>Provision</a> the client id: <input type='text' style='font-weight:bold' value='HKVjhUXySDGLGJimolxAgDdpoCuZLlql' disabled></input> in your hub.</li> <li>Find the complete Source Code <a target='_blank' href='https://github.com/autodesk-platform-services/aps-aecdatamodel-explorer'>HERE</a></li> </ul>",
+    showCloseButton: true,
+    showCancelButton: false,
+    focusConfirm: false,
+    width: 600,
+    confirmButtonText:
+      '<i class="fa fa-thumbs-up"></i> OK',
+  })
+}
 
 async function showToast(message) {
   Swal.fire({
