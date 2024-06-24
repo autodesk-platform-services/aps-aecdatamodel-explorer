@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>AEC Data Model Explorer - BETA</title>
+  <title>AEC Data Model Explorer</title>
   <meta charset="utf-8" />
   <link rel="shortcut icon" href="http://cdn.autodesk.io/favicon.ico">
   <link rel="mask-icon" href="http://cdn.autodesk.io/favicon.ico">
@@ -45,19 +45,24 @@
 <body>
   <div id="header">
     <img class="logo" src="https://cdn.autodesk.io/logo/black/stacked.png" alt="Autodesk Platform Services">
-    <span class="title">AEC Data Model Explorer - BETA</span>
-    <div id="projectinput" data-balloon-length="fit" aria-label="Here goes a project id like b.f609fbf7..."
-      data-balloon-pos="down">
-      <input type="text" placeholder="PASTE THE PROJECT ID HERE" id="projectid" />
-    </div>
+    <span class="title">AEC Data Model Explorer</span>
     <div id="iteminput" data-balloon-length="fit"
-      aria-label="Here goes an item/version id like urn:adsk.wipprod:dm.lineage..." data-balloon-pos="down">
-      <input type="text" placeholder="ITEM/VERSION ID HERE" id="modelurn" />
+      aria-label="Here goes an fileVersionUrn like urn:adsk.wipprod:dm.lineage..." data-balloon-pos="down">
+      <input type="text" placeholder="fileVersionUrn here" id="modelurn" />
     </div>
     <div class="form-check form-switch form-switch-sm">
       <input class="form-check-input" type="checkbox" id="toggleviewer">
       <label class="form-check-label" for="toggleviewer" style="margin:0.3em">Viewer</label>
     </div>
+    <a type="button" class="btn btn-light mr-3" target="_blank" href="/voyager.html">
+      <img src="voyager.svg"  
+        class="header-button"
+        width="24"
+        height="24" 
+        title="Voyager" 
+      />&nbsp;Voyager
+    </a>
+    <img width="30" height="30" src="https://img.icons8.com/ios/50/help--v1.png" alt="help" id="help" />
     <button id="signin" style="visibility: hidden;" data-balloon-length="fit" aria-label="Sign In Here!"
       data-balloon-pos="down">Sign In</button>
   </div>
@@ -70,7 +75,7 @@
     var globalViewer = '';
     var queryResponse = '';
     let defaultQuery = `query GetElementsByFilter{
-    elements(designId: "yourdesignid", filter: {query:"yourfilter"}) {
+      elementsByElementGroup(elementGroupId: "yourdesignid", filter: {query:"yourfilter"}) {
         pagination {
             cursor
         }
@@ -84,16 +89,14 @@
                 }
             }
         }
-    }
-}
-`;
+    }`;
     setInitialTabs();
 
     function setInitialTabs() {
       let tabState = JSON.parse(window.localStorage.getItem('graphiql:tabState'));
       let tutorialTabs = [{ query: 'Task 1' }, { query: 'Task 2' }, { query: 'Task 3' }, { query: 'Task 4' }].map(ensureTutorialTab);
       if (!!tabState) {
-        let nonTutorialTabs = tabState.tabs.filter(tab => !tab.query.match(/Task 1 – Pick a Hub|Task 2 – Pick Project|Task 3 – Retrieve designs from project|Task 4 – Get Elements within a design using a filter/g))
+        let nonTutorialTabs = tabState.tabs.filter(tab => !tab.query.match(/Task 1 – Pick a Hub|Task 2 – Pick Project|Task 3 – Retrieve elementgroups from project|Task 4 – Get Elements within an ElementGroup using a filter/g))
         tabState.tabs = tutorialTabs.concat(nonTutorialTabs);
       }
       else {
@@ -139,73 +142,88 @@
           tab.title = 'GetHubs';
           tab.query = `# Task 1 – Pick a Hub
 query GetHubs {
-  hubs {
-    pagination {
-      cursor
+    hubs {
+      pagination {
+        cursor
+      }
+      results {
+        name
+        id
+      }
     }
-    results {
-      name
-      id
-    }
-  }
 }`;
           break;
         case 'Task 2':
           tab.title = 'GetProjects';
           tab.query = `# Task 2 – Pick Projects
-query GetProjects {
-  projects(hubId: "yourhubid") {
-    pagination {
-      cursor
+query GetProjects($hubId: ID!) {
+    projects(hubId: $hubId) {
+      pagination {
+        cursor
+      }
+      results {
+        id
+        name
+        alternativeIdentifiers{
+          dataManagementAPIProjectId
+        }
+      }
     }
-    results {
-      id
-      name
-      alternativeRepresentations{
-				externalProjectId
-			}
-    }
-  }
+}`;
+          tab.variables = `{
+  "hubId":"yourhubid"
 }`;
           break;
         case 'Task 3':
-          tab.title = 'GetDesignsByProject';
-          tab.query = `# Task 3 – Retrieve designs from project
-query GetDesignsByProject {
-  aecDesignsByProject(projectId: "yourprojectid") {
-    pagination {
-      cursor
+          tab.title = 'GetElementGroupsByProject';
+          tab.query = `# Task 3 – Retrieve elementgroups from project
+query GetElementGroupsByProject($projectId: ID!) {
+    elementGroupsByProject(projectId: $projectId) {
+      pagination {
+        cursor
+      }
+      results{
+        name
+        id
+        alternativeIdentifiers{
+          fileUrn
+          fileVersionUrn
+        }
+      }
     }
-    results{
-      name
-      id
-      alternativeRepresentations{
-				fileUrn
-				fileVersionUrn
-			}
-    }
-  }
+}`;
+          tab.variables = `{
+  "projectId":"yourprojectid"
 }`;
           break;
         case 'Task 4':
           tab.title = 'GetElementsFromCategory';
-          tab.query = `# Task 4 – Get Elements within a design using a filter
-query GetElementsFromCategory {
-  elements(designId: "yourdesignid", filter: {query:"property.name.category==Walls"}) {
-    pagination {
-      cursor
-    }
-    results {
-      id
-      name
-      properties {
-        results {
-          name
-          value
+          tab.query = `# Task 4 – Get Elements within an ElementGroup using a filter
+query GetElementsFromCategory($elementGroupId: ID!, $propertyFilter: String!) {
+    elementsByElementGroup(elementGroupId: $elementGroupId, filter: {query:$propertyFilter}) {
+      pagination {
+        cursor
+      }
+      results {
+        id
+        name
+        properties {
+          results {
+            name
+            value
+            definition {
+              units{
+                name
+              }
+            }
+          }
         }
       }
     }
-  } 
+}`;
+          tab.variables = `{
+  "elementGroupId":"yourelementGroupId",
+  "propertyFilter":"property.name.category==Walls"
 }`;
           break;
       }
@@ -218,13 +236,13 @@ query GetElementsFromCategory {
       let resJSON = await res.json();
       accessToken = resJSON.access_token;
       if (accessToken === undefined) {
-        showHelpers('login');
-        return 'Please login first';
+        showHelpers('sign in');
+        return 'Please sign in first';
       }
 
       const { headers = {} } = opts;
       return fetch(
-        "https://developer.api.autodesk.com/aecdatamodel/graphql",
+        "https://developer.api.autodesk.com/aec/graphql",
         {
           method: "post",
           headers: {
@@ -266,6 +284,8 @@ query GetElementsFromCategory {
     );
   </script>
   <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.js"></script>
+  <!-- Sweetalert2 to handle notifications -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 
 </html>
