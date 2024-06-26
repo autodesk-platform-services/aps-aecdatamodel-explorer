@@ -256,7 +256,7 @@ query GetElementsFromCategory($elementGroupId: ID!, $propertyFilter: String!) {
         const viewerToggle = document.getElementById('toggleviewer');
         queryResponse = await response.json();
         if (!!globalViewer && viewerToggle.checked) {
-          globalViewer.getExtension('AIMFilterExtension').filterModel();
+          globalViewer.getExtension('AECDMFilterExtension').filterModel();
         }
         return queryResponse;
       });
