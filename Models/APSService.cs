@@ -18,8 +18,11 @@ public partial class APSService
 	private readonly string _clientId;
 	private readonly string _clientSecret;
 	private readonly string _callbackUri;
-    private readonly AuthenticationClient _authClient;
-    private readonly DataManagementClient _dataManagementClient;
+	private bool _customCredentials = false;
+	private string _customclientId = "";
+	private string _customclientSecret = "";
+	private readonly AuthenticationClient _authClient;
+	private readonly DataManagementClient _dataManagementClient;
 	private readonly List<Scopes> InternalTokenScopes = new List<Scopes> { Scopes.DataRead, Scopes.ViewablesRead };
 	private readonly List<Scopes> PublicTokenScopes = new List<Scopes> { Scopes.DataRead, Scopes.ViewablesRead };
 
@@ -28,12 +31,12 @@ public partial class APSService
 		_clientId = clientId;
 		_clientSecret = clientSecret;
 		_callbackUri = callbackUri;
-        SDKManager sdkManager = SdkManagerBuilder
-                .Create() // Creates SDK Manager Builder itself.
-                .Build();
+		SDKManager sdkManager = SdkManagerBuilder
+						.Create() // Creates SDK Manager Builder itself.
+						.Build();
 
-        _authClient = new AuthenticationClient(sdkManager);
-        _dataManagementClient = new DataManagementClient(sdkManager);
+		_authClient = new AuthenticationClient(sdkManager);
+		_dataManagementClient = new DataManagementClient(sdkManager);
 
-    }
+	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Autodesk.Authentication.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -42,9 +43,9 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpGet("signin")]
-	public ActionResult Signin()
+	public ActionResult Signin(string? client_id, string? client_secret)
 	{
-		var redirectUri = _apsService.GetAuthorizationURL();
+		var redirectUri = _apsService.GetAuthorizationURL(client_id, client_secret);
 		return Redirect(redirectUri);
 	}
 
@@ -55,6 +56,7 @@ public class AuthController : ControllerBase
 		Response.Cookies.Delete("internal_token");
 		Response.Cookies.Delete("refresh_token");
 		Response.Cookies.Delete("expires_at");
+		_apsService.RemoveCustomCredentials();
 		return Redirect("/");
 	}
 
