@@ -57,6 +57,20 @@ window.addEventListener("load", async () => {
   }
 })
 
+async function showHelpDialog() {
+  Swal.fire({
+    title: '<strong>Helpers</strong>',
+    html:
+      "<ul style='list-style-type:none; font-size:medium'> <li><a target='_blank' href='//tutorials.autodesk.io/#provision-access-in-other-products'>Provision</a> the client id: <input type='text' style='font-weight:bold' value='HKVjhUXySDGLGJimolxAgDdpoCuZLlql' disabled></input> in your hub.</li> <li>Find the complete Source Code <a target='_blank' href='https://github.com/autodesk-platform-services/aps-aecdatamodel-explorer'>HERE</a></li> <li> If you prefer using your own client ID and Secret, <a href='/customcredentials.html'>CLICK HERE</a></li></ul>",
+    showCloseButton: true,
+    showCancelButton: false,
+    focusConfirm: false,
+    width: 600,
+    confirmButtonText:
+      '<i class="fa fa-thumbs-up"></i> OK',
+  })
+}
+
 async function showToast(message) {
   Swal.fire({
     title: message,
