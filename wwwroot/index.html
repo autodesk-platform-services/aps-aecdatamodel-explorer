@@ -74,7 +74,7 @@
   <script>
     var globalViewer = '';
     var queryResponse = '';
-    let defaultQuery = `query GetElementsByFilter{
+    let defaultQuery = `query GetElementsByFilter {
       elementsByElementGroup(elementGroupId: "yourdesignid", filter: {query:"yourfilter"}) {
         pagination {
             cursor
@@ -88,8 +88,9 @@
                     value
                 }
             }
-        }
-    }`;
+      }
+   }
+}`;
     setInitialTabs();
 
     function setInitialTabs() {
