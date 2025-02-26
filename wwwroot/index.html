@@ -22,6 +22,7 @@
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-alpha1/css/bootstrap.min.css" />
   <link rel="stylesheet" href="main.css" />
+  <link rel="stylesheet" href="./otto/aec-datamodel-explorer-otto-chat.css" />
   <!-- This link will always fetch the latest version of Balloon.css -->
   <link rel="stylesheet" href="https://unpkg.com/balloon-css/balloon.min.css">
   <!--
@@ -46,6 +47,7 @@
   <div id="header">
     <img class="logo" src="https://cdn.autodesk.io/logo/black/stacked.png" alt="Autodesk Platform Services">
     <span class="title">AEC Data Model Explorer</span>
+    <div id="ottochat" style="height: 2.5em;"></div>
     <div id="iteminput" data-balloon-length="fit"
       aria-label="Here goes an fileVersionUrn like urn:adsk.wipprod:dm.lineage..." data-balloon-pos="down">
       <input type="text" placeholder="fileVersionUrn here" id="modelurn" />
@@ -55,11 +57,11 @@
       <label class="form-check-label" for="toggleviewer" style="margin:0.3em">Viewer</label>
     </div>
     <a type="button" class="btn btn-light mr-3" target="_blank" href="/voyager.html">
-      <img src="voyager.svg"  
+      <img src="voyager.svg"
         class="header-button"
         width="24"
-        height="24" 
-        title="Voyager" 
+        height="24"
+        title="Voyager"
       />&nbsp;Voyager
     </a>
     <img width="30" height="30" src="https://img.icons8.com/ios/50/help--v1.png" alt="help" id="help" />
@@ -71,6 +73,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://unpkg.com/graphiql@2.0.13/graphiql.min.js" type="application/javascript"></script>
   <script src="main.js" type="module"></script>
+  <script src="otto.js" type="module"></script>
   <script>
     var globalViewer = '';
     var queryResponse = '';
@@ -243,7 +246,8 @@ query GetElementsFromCategory($elementGroupId: ID!, $propertyFilter: String!) {
 
       const { headers = {} } = opts;
       return fetch(
-        "https://developer.api.autodesk.com/aec/graphql",
+        // "https://developer.api.autodesk.com/aec/graphql",
+        "https://developer-stg.api.autodesk.com/aec/graphql",
         {
           method: "post",
           headers: {
