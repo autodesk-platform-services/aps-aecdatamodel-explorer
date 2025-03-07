@@ -104850,7 +104850,6 @@ function _7e() {
       metadata: O.hubs[S.hubId]
     }), J())));
   }, [
-    O,
     S.designId,
     S.projectId,
     S.hubId
