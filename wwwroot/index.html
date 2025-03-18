@@ -46,6 +46,14 @@
   <div id="header">
     <img class="logo" src="https://cdn.autodesk.io/logo/black/stacked.png" alt="Autodesk Platform Services">
     <span class="title">AEC Data Model Explorer</span>
+    <div id="regioninput" data-balloon-length="fit"
+     aria-label="Selected Region" data-balloon-pos="down">
+      <select id="region" class="h100">
+        <option value="US">US</option>
+        <option value="EMEA">EMEA</option>
+        <option value="AUS">AUS</option>
+      </select>
+    </div>
     <div id="iteminput" data-balloon-length="fit"
       aria-label="Here goes an fileVersionUrn like urn:adsk.wipprod:dm.lineage..." data-balloon-pos="down">
       <input type="text" placeholder="fileVersionUrn here" id="modelurn" />
@@ -242,6 +250,7 @@ query GetElementsFromCategory($elementGroupId: ID!, $propertyFilter: String!) {
       }
 
       const { headers = {} } = opts;
+      const region = document.getElementById("region").value;
       return fetch(
         "https://developer.api.autodesk.com/aec/graphql",
         {
@@ -249,6 +258,7 @@ query GetElementsFromCategory($elementGroupId: ID!, $propertyFilter: String!) {
           headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + accessToken,
+            "Region": region,
             ...headers,
           },
           body: JSON.stringify(graphQLParams),
