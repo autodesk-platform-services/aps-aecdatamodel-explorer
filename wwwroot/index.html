@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>AEC Data Model Explorer</title>
+  <title>AEC Data Model Explorer - Beta</title>
   <meta charset="utf-8" />
   <link rel="shortcut icon" href="http://cdn.autodesk.io/favicon.ico">
   <link rel="mask-icon" href="http://cdn.autodesk.io/favicon.ico">
@@ -45,7 +45,7 @@
 <body>
   <div id="header">
     <img class="logo" src="https://cdn.autodesk.io/logo/black/stacked.png" alt="Autodesk Platform Services">
-    <span class="title">AEC Data Model Explorer</span>
+    <span class="title">AEC Data Model Explorer - Beta</span>
     <div id="regioninput" data-balloon-length="fit"
      aria-label="Selected Region" data-balloon-pos="down">
       <select id="region" class="h100">
@@ -252,7 +252,7 @@ query GetElementsFromCategory($elementGroupId: ID!, $propertyFilter: String!) {
       const { headers = {} } = opts;
       const region = document.getElementById("region").value;
       return fetch(
-        "https://developer.api.autodesk.com/aec/graphql",
+        "https://developer.api.autodesk.com/aec/beta/graphql",
         {
           method: "post",
           headers: {
