@@ -23,8 +23,8 @@ public partial class APSService
 	private string _customclientSecret = "";
 	private readonly AuthenticationClient _authClient;
 	private readonly DataManagementClient _dataManagementClient;
-	private readonly List<Scopes> InternalTokenScopes = new List<Scopes> { Scopes.DataRead, Scopes.ViewablesRead, Scopes.DataWrite };
-	private readonly List<Scopes> PublicTokenScopes = new List<Scopes> { Scopes.DataRead, Scopes.ViewablesRead, Scopes.DataWrite };
+	private readonly List<Scopes> InternalTokenScopes = new List<Scopes> { Scopes.DataRead, Scopes.ViewablesRead, Scopes.DataWrite, Scopes.DataCreate };
+	private readonly List<Scopes> PublicTokenScopes = new List<Scopes> { Scopes.DataRead, Scopes.ViewablesRead, Scopes.DataWrite, Scopes.DataCreate };
 
 	public APSService(string clientId, string clientSecret, string callbackUri)
 	{
